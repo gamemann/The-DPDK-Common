@@ -31,7 +31,7 @@ struct lcore_queue_conf
 
 /* Extern global variables */
 #ifndef DPDK_COMMON
-extern volatile bool quit;
+extern volatile __u8 quit;
 extern __u16 nb_rxd;
 extern __u16 nb_txd;
 extern struct rte_ether_addr portseth[RTE_MAX_ETHPORTS];
