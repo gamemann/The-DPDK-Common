@@ -1,5 +1,3 @@
-CC = clang
-
 BUILDDIR=objs
 SRCDIR=src
 
@@ -28,9 +26,14 @@ $(error "Cannot generate statically-linked binaries with this version of pkg-con
 endif
 endif
 
-$(BUILDDIR)/$(DPDKCOMMONOBJ): $(DPDKCOMMONSRC) Makefile $(PC_FILE) | build
+all: $(BUILDDIR)/$(DPDKCOMMONOBJ)-build
+.PHONY: all
+
+makebuilddir:
 	mkdir -p $(BUILDDIR)
-	$(CC) -c $(CFLAGS) $(SRCDIR)/$(DPDKCOMMONSRC) -o $@ $(LDFLAGS) $(LDFLAGS_SHARED)
+
+$(BUILDDIR)/$(DPDKCOMMONOBJ)-build: $(SRCDIR)/$(DPDKCOMMONSRC) Makefile $(PC_FILE) | makebuilddir
+	$(CC) -Wno-unused-command-line-argument -c $(CFLAGS) $(SRCDIR)/$(DPDKCOMMONSRC) -o $(BUILDDIR)/$(DPDKCOMMONOBJ) $(LDFLAGS) $(LDFLAGS_SHARED)
 
 .PHONY: clean
 clean:
