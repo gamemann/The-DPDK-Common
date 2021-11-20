@@ -35,8 +35,6 @@
 
 volatile bool quit;
 
-int promison;
-
 __u16 nb_rxd = RTE_RX_DESC_DEFAULT;
 __u16 nb_txd = RTE_TX_DESC_DEFAULT;
 
