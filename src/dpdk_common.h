@@ -30,26 +30,28 @@ struct lcore_queue_conf
 } __rte_cache_aligned;
 
 /* Extern global variables */
+#ifndef DPDK_COMMON
 extern volatile bool quit;
 extern int promison;
 extern __u16 nb_rxd;
 extern __u16 nb_txd;
-extern struct rte_ether_addr portseth;
+extern struct rte_ether_addr portseth[RTE_MAX_ETHPORTS];
 extern __u32 enabled_portmask;
-extern __u32 dstports;
-extern struct port_pair_params port_pair_params_array;
+extern __u32 dstports[RTE_MAX_ETHPORTS];
+extern struct port_pair_params port_pair_params_array[RTE_MAX_ETHPORTS / 2];
 extern struct port_pair_params *port_pair_params;
 extern __u16 nb_port_pair_params;
 extern unsigned int rxqueuepl;
-extern struct lcore_queue_conf lcore_queue_conf;
-extern struct rte_eth_dev_tx_buffer *tx_buffer;
+extern struct lcore_queue_conf lcore_queue_conf[RTE_MAX_LCORE];
+extern struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS];
 extern struct rte_eth_conf port_conf;
 extern struct rte_mempool *pcktmbuf_pool;
+#endif
 
 /* Define functions */
-void parse_portmask(const char *arg);
+int parse_portmask(const char *arg);
 int parse_port_pair_config(const char *arg);
 unsigned int parse_queues(const char *arg);
-int check_port_pair_config(void)
+int check_port_pair_config(void);
 void check_all_ports_link_status(__u32 portmask);
 #endif

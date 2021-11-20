@@ -26,18 +26,21 @@
 #include <rte_random.h>
 #include <rte_debug.h>
 #include <rte_ether.h>
+#include <rte_ethdev.h>
 #include <rte_mempool.h>
 #include <rte_mbuf.h>
 #include <rte_string_fns.h>
 
 #include "dpdk_common.h"
 
+#define DPDK_COMMON
+
 volatile bool quit;
 
 int promison;
 
-__u16 nb_rxd = RTE_RX_DESC_DEFAULT
-__u16 nb_txd = RTE_TX_DESC_DEFAULT
+__u16 nb_rxd = RTE_RX_DESC_DEFAULT;
+__u16 nb_txd = RTE_TX_DESC_DEFAULT;
 
 struct rte_ether_addr portseth[RTE_MAX_ETHPORTS];
 __u32 enabled_portmask = 0;
@@ -67,13 +70,13 @@ struct rte_eth_conf port_conf =
 
 struct rte_mempool *pcktmbuf_pool = NULL;
 
-void parse_portmask(const char *arg)
+int parse_portmask(const char *arg)
 {
     char *end = NULL;
     unsigned long pm;
 
     // Parse hexadecimal.
-    pm = strtoul(portmask, &end, 16);
+    pm = strtoul(arg, &end, 16);
 
     return pm;
 }
@@ -101,7 +104,7 @@ int parse_port_pair_config(const char *arg)
     {
         p++;
 
-        p0 = strchr('p', ')');
+        p0 = strchr(p, ')');
 
         if (p == NULL)
         {
@@ -227,7 +230,7 @@ void check_all_ports_link_status(__u32 portmask)
     fprintf(stdout, "Checking link status...\n");
     fflush(stdout);
     
-    for (count = 0; i <= MAX_CHECK_TIME; count++)
+    for (count = 0; count <= MAX_CHECK_TIME; count++)
     {
         if (quit)
         {
