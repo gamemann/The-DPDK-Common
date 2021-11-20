@@ -50,4 +50,6 @@ extern struct rte_mempool *pcktmbuf_pool;
 void parse_portmask(const char *arg);
 int parse_port_pair_config(const char *arg);
 unsigned int parse_queues(const char *arg);
+int check_port_pair_config(void)
+void check_all_ports_link_status(__u32 portmask);
 #endif
