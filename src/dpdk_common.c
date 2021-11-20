@@ -33,8 +33,6 @@
 
 #include "dpdk_common.h"
 
-#define DPDK_COMMON
-
 volatile bool quit;
 
 int promison;
