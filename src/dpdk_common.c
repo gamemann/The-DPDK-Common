@@ -782,7 +782,7 @@ int dpdkc_ports_available()
 void dpdkc_launch_and_run(int (*f))
 {
     // Launch the application on each l-core.
-    rte_eal_mp_remote_launch(*f, NULL, CALL_MAIN);
+    rte_eal_mp_remote_launch((int (*)(void *))f, NULL, CALL_MAIN);
 
     RTE_LCORE_FOREACH_WORKER(lcore_id)
     {
