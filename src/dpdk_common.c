@@ -355,11 +355,9 @@ struct dpdkc_error dpdkc_check_port_pair_config(void)
 /**
  * Checks and prints the status of all running ports.
  * 
- * @param port_mask The enabled port mask.
- * 
  * @return Void
 **/
-void dpdkc_check_link_status(__u32 port_mask)
+void dpdkc_check_link_status()
 {
     // Initialize variables.
     __u16 port_id;
@@ -394,7 +392,7 @@ void dpdkc_check_link_status(__u32 port_mask)
             }
 
             // Make sure this port is enabled through the port mask.
-            if ((port_mask & (1 << port_id)) == 0)
+            if ((enabled_port_mask & (1 << port_id)) == 0)
             {
                 continue;
             }

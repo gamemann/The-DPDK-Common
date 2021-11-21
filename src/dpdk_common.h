@@ -89,7 +89,7 @@ unsigned long dpdkc_parse_arg_port_mask(const char *arg);
 struct dpdkc_error dpdkc_parse_arg_port_pair_config(const char *arg);
 unsigned int dpdkc_parse_arg_queues(const char *arg);
 struct dpdkc_error dpdkc_check_port_pair_config(void);
-void dpdkc_check_link_status(__u32 port_mask);
+void dpdkc_check_link_status();
 int dpdkc_eal_init(int argc, char **argv);
 unsigned short dpdkc_get_nb_ports();
 int dpdkc_check_port_pairs();
