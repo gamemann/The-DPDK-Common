@@ -32,7 +32,7 @@ __u32 dst_ports[RTE_MAX_ETHPORTS];
 // Port pair params array.
 struct port_pair_params port_pair_params_array[RTE_MAX_ETHPORTS / 2];
 
-// Port pair params.
+// Port pair params pointer.
 struct port_pair_params *port_pair_params;
 
 // The number of port pair parameters.
