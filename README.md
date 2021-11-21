@@ -136,14 +136,13 @@ struct dpdkc_error dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_que
 int dpdkc_ports_available();
 
 /**
- * Initializes the DPDK application's EAL.
+ * Launches the DPDK application and waits for all l-cores to exit.
  * 
  * @param f A pointer to the function to launch on all l-cores when ran.
- * @param argv Pointer to arguments array.
  * 
  * @return Void
 **/
-void dpdkc_launch_and_run(int (*f));
+void dpdkc_launch_and_run(void *f);
 
 /**
  * Stops and removes all running ports.
