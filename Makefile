@@ -33,7 +33,7 @@ makebuilddir:
 	mkdir -p $(BUILDDIR)
 
 $(BUILDDIR)/$(DPDKCOMMONOBJ)-build: $(SRCDIR)/$(DPDKCOMMONSRC) Makefile $(PC_FILE) | makebuilddir
-	$(CC) -Wno-unused-command-line-argument -c $(CFLAGS) $(SRCDIR)/$(DPDKCOMMONSRC) -o $(BUILDDIR)/$(DPDKCOMMONOBJ) $(LDFLAGS) $(LDFLAGS_SHARED)
+	$(CC) -c $(CFLAGS) $(SRCDIR)/$(DPDKCOMMONSRC) -o $(BUILDDIR)/$(DPDKCOMMONOBJ) $(LDFLAGS) $(LDFLAGS_SHARED)
 
 .PHONY: clean
 clean:
