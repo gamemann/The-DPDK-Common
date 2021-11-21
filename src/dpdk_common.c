@@ -73,12 +73,8 @@ __u16 port_id = 0;
 __u16 nb_ports = 0;
 __u16 nb_ports_available = 0;
 
-// L-core and RX l-core IDs.
+// L-core ID.
 unsigned int lcore_id = 0;
-unsigned int rx_lcore_id = 0;
-
-// Number of ports in port mask.
-unsigned nb_ports_in_mask = 0;
 
 // Number of l-cores.
 unsigned int nb_lcores = 0;
@@ -495,6 +491,9 @@ void dpdkc_reset_dst_ports()
 **/
 void dpdkc_populate_dst_ports()
 {
+    // Number of ports in a mask.
+    unsigned nb_ports_in_mask = 0;
+
     // Check port pair params first.
     if (port_pair_params != NULL)
     {
@@ -555,6 +554,9 @@ int dpdkc_ports_queues_mapping()
 {
     // Pointer we'll be storing individual l-core configs in.
     struct lcore_queue_conf *qconf = NULL;
+
+    // RX l-core ID.
+    unsigned int rx_lcore_id = 0;
 
     RTE_ETH_FOREACH_DEV(port_id)
     {

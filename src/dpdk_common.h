@@ -73,8 +73,6 @@ extern __u16 port_id;
 extern __u16 nb_ports;
 extern __u16 nb_ports_available;
 extern unsigned int lcore_id;
-extern unsigned int rx_lcore_id;
-extern unsigned nb_ports_in_mask;
 extern unsigned int nb_lcores;
 #endif
 
