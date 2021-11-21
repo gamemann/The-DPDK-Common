@@ -23,7 +23,7 @@ Including the `src/dpdk_common.h` header in a source or another header file will
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
  * @return Returns the port mask.
- */
+**/
 unsigned long dpdkc_parse_arg_port_mask(const char *arg);
 
 /**
@@ -32,7 +32,7 @@ unsigned long dpdkc_parse_arg_port_mask(const char *arg);
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
  * @return 0 on success and -1 on error.
-*/
+**/
 int dpdkc_parse_arg_port_pair_config(const char *arg);
 
 /**
@@ -41,14 +41,14 @@ int dpdkc_parse_arg_port_pair_config(const char *arg);
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
  * @return Returns the amount of queues.
-*/
+**/
 unsigned int dpdkc_parse_arg_queues(const char *arg);
 
 /**
  * Checks the port pair config after initialization.
  * 
  * @return 0 on success or -1 on error.
-*/
+**/
 int dpdkc_check_port_pair_config(void);
 
 /**
@@ -57,8 +57,109 @@ int dpdkc_check_port_pair_config(void);
  * @param port_mask The enabled port mask.
  * 
  * @return Void
-*/
+**/
 void dpdkc_check_link_status(__u32 port_mask);
+
+/**
+ * Initializes the DPDK application's EAL.
+ * 
+ * @param argc The argument count.
+ * @param argv Pointer to arguments array.
+ * 
+ * @return Return value of rte_eal_init().
+**/
+int dpdkc_eal_init(int argc, char **argv);
+
+/**
+ * Retrieves the amount of ports available.
+ * 
+ * @return The amount of ports available.
+**/
+unsigned short dpdkc_get_nb_ports();
+
+/**
+ * Checks all port pairs.
+ * 
+ * @return 0 on success or -1 on failure.
+**/
+int dpdkc_check_port_pairs();
+
+/**
+ * Checks all ports against port mask.
+ * 
+ * @return 0 on success or -1 on failure.
+**/
+int dpdkc_ports_are_valid();
+
+/**
+ * Resets all destination ports.
+ * 
+ * @return Void
+**/
+void dpdkc_reset_dst_ports();
+
+/**
+ * Populations all destination ports.
+ * 
+ * @return Void
+**/
+void dpdkc_populate_dst_ports();
+
+/**
+ * Maps ports and queues to each l-core.
+ * 
+ * @return 0 on success or -1 on error (l-core count exceeds max l-cores configured).
+**/
+int dpdkc_ports_queues_mapping();
+
+/**
+ * Creates the packet's mbuf pool.
+ * 
+ * @return 0 on success or -1 on error (allocation failed).
+**/
+int dpdkc_create_mbuf();
+
+/**
+ * Initializes all ports and RX/TX queues.
+ * 
+ * @param promisc If 1, promisc mode is turned on for all ports/devices.
+ * @param rx_queue The amount of RX queues per port (recommend setting to 1).
+ * @param tx_queue The amount of TX queues per port (recommend setting to 1).
+ * 
+ * @return 0 on success or error codes of function calls.
+**/
+int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
+
+/**
+ * Check if the number of available ports is above one.
+ * 
+ * @return 1 on available or 0 for none available.
+**/
+int dpdkc_ports_available();
+
+/**
+ * Initializes the DPDK application's EAL.
+ * 
+ * @param f A pointer to the function to launch on all l-cores when ran.
+ * @param argv Pointer to arguments array.
+ * 
+ * @return Void
+**/
+void dpdkc_launch_and_run(int (*f));
+
+/**
+ * Stops and removes all running ports.
+ * 
+ * @return 0 on success or return value of rte_eth_dev_stop() on error.
+**/
+int dpdkc_port_stop_and_remove();
+
+/**
+ * Cleans up the DPDK application's EAL.
+ * 
+ * @return Void
+**/
+void dpdkc_eal_cleanup();
 ```
 
 ## Global Variables
@@ -114,6 +215,19 @@ struct rte_eth_conf port_conf =
 
 // A pointer to the mbuf_pool for packets.
 struct rte_mempool *pcktmbuf_pool = NULL;
+
+// The current port ID.
+__u16 port_id = 0;
+
+// Number of ports and ports available.
+__u16 nb_ports = 0;
+__u16 nb_ports_available = 0;
+
+// L-core ID.
+unsigned int lcore_id = 0;
+
+// Number of l-cores.
+unsigned int nb_lcores = 0;
 ```
 
 ## Credits
