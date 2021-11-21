@@ -18,11 +18,11 @@ Including the `src/dpdk_common.h` header in a source or another header file will
 
 ```C
 /**
- * Parses the port mask argument
+ * Parses the port mask argument.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return The port mask
+ * @return Returns the port mask.
  */
 unsigned long dpdkc_parse_arg_port_mask(const char *arg);
 
@@ -36,7 +36,7 @@ unsigned long dpdkc_parse_arg_port_mask(const char *arg);
 int dpdkc_parse_arg_port_pair_config(const char *arg);
 
 /**
- * Parses the queue number argument
+ * Parses the queue number argument.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
