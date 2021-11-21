@@ -157,9 +157,9 @@ int dpdkc_port_stop_and_remove();
 /**
  * Cleans up the DPDK application's EAL.
  * 
- * @return Void
+ * @return Return value of rte_eal_cleanup().
 **/
-void dpdkc_eal_cleanup();
+int dpdkc_eal_cleanup();
 ```
 
 ## Global Variables
