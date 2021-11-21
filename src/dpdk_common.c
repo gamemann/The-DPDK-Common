@@ -584,7 +584,7 @@ void dpdkc_reset_dst_ports()
 }
 
 /**
- * Populations all destination ports.
+ * Populates all destination ports.
  * 
  * @return Void
 **/
