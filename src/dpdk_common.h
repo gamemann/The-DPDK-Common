@@ -52,13 +52,14 @@ struct lcore_queue_conf
     unsigned rxportlist[MAX_RX_QUEUE_PER_LCORE];
 } __rte_cache_aligned;
 
-struct dpdkc_error
+struct dpdkc_ret
 {
     char *gen_msg;
     int err_num;
     int port_id;
     int rx_id;
     int tx_id;
+    void *data;
 };
 
 /* Global variables for use in other objects/executables using this header file */
@@ -85,23 +86,23 @@ extern unsigned int nb_lcores;
 #endif
 
 /* Functions for use in other objects/executables using this header file */
-unsigned long dpdkc_parse_arg_port_mask(const char *arg);
-struct dpdkc_error dpdkc_parse_arg_port_pair_config(const char *arg);
-unsigned int dpdkc_parse_arg_queues(const char *arg);
-struct dpdkc_error dpdkc_check_port_pair_config(void);
+struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg);
+struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg);
+struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg);
+struct dpdkc_ret dpdkc_check_port_pair_config(void);
 void dpdkc_check_link_status();
-int dpdkc_eal_init(int argc, char **argv);
-unsigned short dpdkc_get_nb_ports();
-int dpdkc_check_port_pairs();
-int dpdkc_ports_are_valid();
+struct dpdkc_ret dpdkc_eal_init(int argc, char **argv);
+struct dpdkc_ret dpdkc_get_nb_ports();
+struct dpdkc_ret dpdkc_check_port_pairs();
+struct dpdkc_ret dpdkc_ports_are_valid();
 void dpdkc_reset_dst_ports();
 void dpdkc_populate_dst_ports();
-int dpdkc_ports_queues_mapping();
-int dpdkc_create_mbuf();
-struct dpdkc_error dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
-int dpdkc_ports_available();
+struct dpdkc_ret dpdkc_ports_queues_mapping();
+struct dpdkc_ret dpdkc_create_mbuf();
+struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
+struct dpdkc_ret dpdkc_ports_available();
 void dpdkc_launch_and_run(void *f);
-int dpdkc_port_stop_and_remove();
-int dpdkc_eal_cleanup();
-void dpdkc_check_error(struct dpdkc_error *err);
+struct dpdkc_ret dpdkc_port_stop_and_remove();
+struct dpdkc_ret dpdkc_eal_cleanup();
+void dpdkc_check_ret(struct dpdkc_ret *ret);
 #endif

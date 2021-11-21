@@ -88,21 +88,47 @@ static int dpdkc_port_enabled()
 }
 
 /**
+ * Initializes a DPDK Common result type and returns it with default values.
+ * WARNING - Static function (cannot use outside of this file).
+ * 
+ * @return The DPDK Common return structure (struct dpdkc_ret).
+**/
+static struct dpdkc_ret dpdkc_ret_init()
+{
+    struct dpdkc_ret ret =
+    {
+        .err_num = 0,
+        .gen_msg = NULL,
+        .port_id = -1,
+        .rx_id = -1,
+        .tx_id = -1,
+        .data = NULL
+    };
+
+    return ret;
+}
+
+/**
  * Parses the port mask argument.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return Returns the port mask.
+ * @return The DPDK Common return structure (struct dpdkc_ret). The port mask is stored in ret->data.
 **/
-unsigned long dpdkc_parse_arg_port_mask(const char *arg)
+struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg)
 {
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
     char *end = NULL;
     unsigned long pm;
 
     // Parse hexadecimal.
     pm = strtoul(arg, &end, 16);
 
-    return pm;
+    ret.data = (void *)&pm;
+
+    return ret;
 }
 
 /**
@@ -110,18 +136,12 @@ unsigned long dpdkc_parse_arg_port_mask(const char *arg)
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return The DPDKC error structure (struct dpdkc_error).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_error dpdkc_parse_arg_port_pair_config(const char *arg)
+struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg)
 {
-    struct dpdkc_error ret = 
-    {
-        .err_num = 0,
-        .gen_msg = NULL,
-        .port_id = -1,
-        .rx_id = -1,
-        .tx_id = -1
-    };
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
 
     // For readability, we'll define these in an enum.s
     enum fieldnames
@@ -249,10 +269,13 @@ struct dpdkc_error dpdkc_parse_arg_port_pair_config(const char *arg)
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return Returns the amount of queues.
+ * @return The DPDK Common return structure (struct dpdkc_ret). The amount of queues is stored in ret->data.
 **/
-unsigned int dpdkc_parse_arg_queues(const char *arg)
+struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg)
 {
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
     // Initialize a couple necessary variables.
     char *end = NULL;
     unsigned long n;
@@ -263,35 +286,35 @@ unsigned int dpdkc_parse_arg_queues(const char *arg)
     // Check queue count.
     if (n < 1 || n >= MAX_RX_QUEUE_PER_LCORE)
     {
-        return 0;
+        ret.err_num = -1;
+        ret.gen_msg = "Amount of queues is below 0.";
+
+        return ret;
     }
 
-    return n;
+    ret.data = (void *)&n;
+
+    return ret;
 }
 
 /**
  * Checks the port pair config after initialization.
  * 
- * @return The DPDKC error structure (struct dpdkc_error).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_error dpdkc_check_port_pair_config(void)
+struct dpdkc_ret dpdkc_check_port_pair_config(void)
 {
-    // Initialize return variable (custom error).
-    struct dpdkc_error ret = 
-    {
-        .err_num = 0,
-        .gen_msg = NULL,
-        .port_id = -1,
-        .rx_id = -1,
-        .tx_id = -1
-    };
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
 
     // Port pair config mask and port pair mask.
     __u32 ppcm;
     __u32 ppm;
 
     // Other variables for iteration.
-    __u16 index, i, port_id;
+    __u16 index; 
+    __u16 i; 
+    __u16 port_id;
 
     // Loop through each port pair.
     for (index = 0; index < nb_port_pair_params; index++)
@@ -347,8 +370,6 @@ struct dpdkc_error dpdkc_check_port_pair_config(void)
     enabled_port_mask &= ppcm;
 
     // Return for success!
-    ret.err_num = 0;
-
     return ret;
 }
 
@@ -463,47 +484,89 @@ void dpdkc_check_link_status()
  * @param argc The argument count.
  * @param argv Pointer to arguments array.
  * 
- * @return Return value of rte_eal_init().
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_eal_init(int argc, char **argv)
+struct dpdkc_ret dpdkc_eal_init(int argc, char **argv)
 {
-    return rte_eal_init(argc, argv);
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
+    ret.err_num = rte_eal_init(argc, argv);
+
+    if (ret.err_num != 0)
+    {
+        ret.gen_msg = "Failed to initialize EAL.";
+    }
+
+    return ret;
 }
 
 /**
  * Retrieves the amount of ports available.
  * 
- * @return The amount of ports available.
+ * @return The DPDK Common return structure (struct dpdkc_ret). Number of available ports are stored inside of ret->data.
 **/
-unsigned short dpdkc_get_nb_ports()
+struct dpdkc_ret dpdkc_get_nb_ports()
 {
-    return rte_eth_dev_count_avail();
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
+    unsigned short num = rte_eth_dev_count_avail();
+
+    ret.err_num = (num > 0) ? 0 : -1;
+
+    if (ret.err_num != 0)
+    {
+        ret.gen_msg = "No available ports.";
+    }
+
+    ret.data = (void *)&num;
+
+    return ret;
 }
 
 /**
  * Checks all port pairs.
  * 
- * @return 0 on success or -1 on failure.
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_check_port_pairs()
+struct dpdkc_ret dpdkc_check_port_pairs()
 {
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
     // If port params is NULL, ignore and return success.
-    if (port_pair_params == NULL)
+    if (port_pair_params != NULL)
     {
-        return 0;
+        ret.err_num = dpdkc_check_port_pair_config().err_num;
     }
 
-    return dpdkc_check_port_pair_config().err_num;
+    if (ret.err_num != 0)
+    {
+        ret.gen_msg = "Failed to check port pair config.";
+    }
+
+    return ret;
 }
 
 /**
  * Checks all ports against port mask.
  * 
- * @return 0 on success or -1 on failure.
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_ports_are_valid()
+struct dpdkc_ret dpdkc_ports_are_valid()
 {
-    return !(enabled_port_mask & ~((1 << nb_ports) - 1));
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
+    
+    ret.err_num = !(enabled_port_mask & ~((1 << nb_ports) - 1));
+
+    if (ret.err_num != 0)
+    {
+        ret.gen_msg = "Number of ports failed against enabled port mask.";
+    }
+
+    return ret;
 }
 
 /**
@@ -587,10 +650,13 @@ void dpdkc_populate_dst_ports()
 /**
  * Maps ports and queues to each l-core.
  * 
- * @return 0 on success or -1 on error (l-core count exceeds max l-cores configured).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_ports_queues_mapping()
+struct dpdkc_ret dpdkc_ports_queues_mapping()
 {
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
     // Pointer we'll be storing individual l-core configs in.
     struct lcore_queue_conf *qconf = NULL;
 
@@ -614,7 +680,10 @@ int dpdkc_ports_queues_mapping()
             // If the new ID is higher or equal to the maximum lcore count, we need to exit with an error.
             if (rx_lcore_id >= RTE_MAX_LCORE)
             {
-                return -1;
+                ret.err_num = -1;
+                ret.gen_msg = "Failed due to l-core ID exceeding the maximum amount of l-cores.";
+
+                return ret;
             }
         }
 
@@ -635,16 +704,19 @@ int dpdkc_ports_queues_mapping()
         fprintf(stdout, "Setting up l-core #%u with RX port %u and TX port %u.\n", rx_lcore_id, port_id, dst_ports[port_id]);
     }
 
-    return 0;
+    return ret;
 }
 
 /**
  * Creates the packet's mbuf pool.
  * 
- * @return 0 on success or -1 on error (allocation failed).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_create_mbuf()
+struct dpdkc_ret dpdkc_create_mbuf()
 {
+    // Initialize return variable (custom error).
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
     // Retrieve amount of mbufs to create.
     unsigned int nb_mbufs = RTE_MAX(nb_ports * (nb_rxd + nb_txd + nb_lcores & MEMPOOL_CACHE_SIZE), 8192U);
 
@@ -654,11 +726,11 @@ int dpdkc_create_mbuf()
     // Check if the mbuf pool is NULL.
     if (pcktmbuf_pool == NULL)
     {
-        return -1;
+        ret.gen_msg = "Failed to create packet's mbuf pool.";
+        ret.err_num = -1;
     }
 
-    // Return 0 for success!
-    return 0;
+    return ret;
 }
 
 /**
@@ -668,19 +740,12 @@ int dpdkc_create_mbuf()
  * @param rx_queue The amount of RX queues per port (recommend setting to 1).
  * @param tx_queue The amount of TX queues per port (recommend setting to 1).
  * 
- * @return The DPDKC error structure (struct dpdkc_error).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_error dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
+struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
 {
     // Initialize return variable (custom error).
-    struct dpdkc_error ret = 
-    {
-        .err_num = 0,
-        .gen_msg = NULL,
-        .port_id = -1,
-        .rx_id = -1,
-        .tx_id = -1
-    };
+    struct dpdkc_ret ret = dpdkc_ret_init();
 
     RTE_ETH_FOREACH_DEV(port_id)
     {
@@ -842,19 +907,23 @@ struct dpdkc_error dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_que
     }
 
     // We're done!
-    ret.err_num = 0;
-
     return ret;
 }
 
 /**
  * Check if the number of available ports is above one.
  * 
- * @return 1 on available or 0 for none available.
+ * @return The DPDK Common return structure (struct dpdkc_ret).. The amount of available ports is returned in ret->data.
 **/
-int dpdkc_ports_available()
+struct dpdkc_ret dpdkc_ports_available()
 {
-    return nb_ports_available > 0;
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
+    ret.err_num = nb_ports_available > 0;
+    ret.data = (void *)&nb_ports_available;
+
+    return ret;
 }
 
 /**
@@ -881,12 +950,12 @@ void dpdkc_launch_and_run(void *f)
 /**
  * Stops and removes all running ports.
  * 
- * @return 0 on success or return value of rte_eth_dev_stop() on error.
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_port_stop_and_remove()
+struct dpdkc_ret dpdkc_port_stop_and_remove()
 {
-    // Create return value variable.
-    int ret = -1;
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
 
     RTE_ETH_FOREACH_DEV(port_id)
     {
@@ -899,7 +968,7 @@ int dpdkc_port_stop_and_remove()
         fprintf(stdout, "Closing port #%u.\n", port_id);
 
         // Stop the port and check.
-        if ((ret = rte_eth_dev_stop(port_id)) != 0)
+        if ((ret.err_num = rte_eth_dev_stop(port_id)) != 0)
         {
             return ret;
         }
@@ -908,31 +977,34 @@ int dpdkc_port_stop_and_remove()
         rte_eth_dev_close(port_id);
     }
 
-    // Return 0 for success.
-    return 0;
+    return ret;
 }
 
 /**
  * Cleans up the DPDK application's EAL.
  * 
- * @return Return value of rte_eal_cleanup().
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_eal_cleanup()
+struct dpdkc_ret dpdkc_eal_cleanup()
 {
-    return rte_eal_cleanup();
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
+    ret.err_num = rte_eal_cleanup();
+
+    return ret;
 }
 
 /**
- * Checks error from dpdkc_error structure and prints error along with exits if found.
+ * Checks error from dpdkc_ret structure and prints error along with exits if found.
  * 
  * @return Void
 **/
-void dpdkc_check_error(struct dpdkc_error *err)
+void dpdkc_check_error(struct dpdkc_ret *ret)
 {
-    if (err->err_num != 0)
+    if (ret->err_num != 0)
     {
         char msg[256];
-        snprintf(msg, sizeof(msg) - 1, "%s Port ID => %d. RX queue ID => %d. TX queue ID => %d. Error => %s (%d).\n", (err->gen_msg != NULL) ? err->gen_msg : "N/A", err->port_id, err->rx_id, err->tx_id, strerror(-err->err_num), err->err_num);
+        snprintf(msg, sizeof(msg) - 1, "%s Port ID => %d. RX queue ID => %d. TX queue ID => %d. Error => %s (%d).\n", (ret->gen_msg != NULL) ? ret->gen_msg : "N/A", ret->port_id, ret->rx_id, ret->tx_id, strerror(-ret->err_num), ret->err_num);
 
         rte_exit(EXIT_FAILURE, "%s", msg);
     }
