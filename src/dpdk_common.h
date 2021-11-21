@@ -1,6 +1,7 @@
 #ifndef DPDK_COMMON_HEADER
 #define DPDK_COMMON_HEADER
 
+/* Include main headers from the DPDK */
 #include <rte_common.h>
 #include <rte_log.h>
 #include <rte_malloc.h>
@@ -39,6 +40,7 @@
 #define CHECK_INTERVAL 100
 #define MAX_CHECK_TIME 90
 
+/* Structures */
 struct port_pair_params
 {
     __u16 port[NUM_PORTS];
@@ -50,28 +52,28 @@ struct lcore_queue_conf
     unsigned rxportlist[MAX_RX_QUEUE_PER_LCORE];
 } __rte_cache_aligned;
 
-/* Extern global variables */
+/* Global variables for use in other objects/executables using this header file */
 #ifndef DPDK_COMMON
 extern volatile __u8 quit;
 extern __u16 nb_rxd;
 extern __u16 nb_txd;
-extern struct rte_ether_addr portseth[RTE_MAX_ETHPORTS];
+extern struct rte_ether_addr ports_eth[RTE_MAX_ETHPORTS];
 extern __u32 enabled_portmask;
-extern __u32 dstports[RTE_MAX_ETHPORTS];
+extern __u32 dst_ports[RTE_MAX_ETHPORTS];
 extern struct port_pair_params port_pair_params_array[RTE_MAX_ETHPORTS / 2];
 extern struct port_pair_params *port_pair_params;
 extern __u16 nb_port_pair_params;
-extern unsigned int rxqueuepl;
+extern unsigned int rx_queue_pl;
 extern struct lcore_queue_conf lcore_queue_conf[RTE_MAX_LCORE];
 extern struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS];
 extern struct rte_eth_conf port_conf;
 extern struct rte_mempool *pcktmbuf_pool;
 #endif
 
-/* Define functions */
-int parse_portmask(const char *arg);
-int parse_port_pair_config(const char *arg);
-unsigned int parse_queues(const char *arg);
-int check_port_pair_config(void);
-void check_all_ports_link_status(__u32 portmask);
+/* Functions for use in other objects/executables using this header file */
+unsigned long dpdkc_parse_arg_port_mask(const char *arg);
+int dpdkc_parse_arg_port_pair_config(const char *arg);
+unsigned int dpdkc_parse_arg_queues(const char *arg);
+int dpdkc_check_port_pair_config(void);
+void dpdkc_check_link_status(__u32 port_mask);
 #endif
