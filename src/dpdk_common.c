@@ -110,10 +110,19 @@ unsigned long dpdkc_parse_arg_port_mask(const char *arg)
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return 0 on success and -1 on error.
+ * @return The DPDKC error structure (struct dpdkc_error).
 **/
-int dpdkc_parse_arg_port_pair_config(const char *arg)
+struct dpdkc_error dpdkc_parse_arg_port_pair_config(const char *arg)
 {
+    struct dpdkc_error ret = 
+    {
+        .err_num = 0,
+        .gen_msg = NULL,
+        .port_id = -1,
+        .rx_id = -1,
+        .tx_id = -1
+    };
+
     // For readability, we'll define these in an enum.s
     enum fieldnames
     {
@@ -158,7 +167,10 @@ int dpdkc_parse_arg_port_pair_config(const char *arg)
         // Check if we're NULL (otherwise may segfault).
         if (p == NULL)
         {
-            return -1;
+            ret.err_num = -1;
+            ret.gen_msg = "Port pair variable p is NULL.";
+
+            return ret;
         }
 
         // Get the size of the pair values.
@@ -167,7 +179,10 @@ int dpdkc_parse_arg_port_pair_config(const char *arg)
         // It should not be even close to 256 bytes.
         if (size >= sizeof(s))
         {
-            return -1;
+            ret.err_num = -1;
+            ret.gen_msg = "Port pair data size exceeds 256 bytes (should never happen).";
+
+            return ret;
         }
 
         // Copy the port pair data to 's' char array.
@@ -179,7 +194,10 @@ int dpdkc_parse_arg_port_pair_config(const char *arg)
         // Split string by ',' which divides both integers for port pair.
         if (rte_strsplit(s, sizeof(s), str_fld, _NUM_FLD, ',') != _NUM_FLD)
         {
-            return -1;
+            ret.err_num = -1;
+            ret.gen_msg = "Failed to split port pair data.";
+            
+            return ret;
         }
 
         // Loop through _NUM_FLD (should be 2).
@@ -194,16 +212,20 @@ int dpdkc_parse_arg_port_pair_config(const char *arg)
             // If error isn't empty, we're locaated at the ')' character or we exceed max ethernet ports, fail.
             if (errno != 0 || end == str_fld[i] || int_fld[i] >= RTE_MAX_ETHPORTS)
             {
-                return -1;
+                ret.err_num = errno;
+                ret.gen_msg = "Error number present or reached out of port pair data.";
+                
+                return ret;
             }
         }
 
         // Make sure we don't exceed max number of port pairs.
         if (nb_port_pair_params >= RTE_MAX_ETHPORTS / 2)
         {
-            fprintf(stderr, "Exceeded maximum number of port pair params: %hu.\n", nb_port_pair_params);
-
-            return -1;
+            ret.err_num = -1;
+            ret.gen_msg = "Exceeded maximum number of port pairs.";
+            
+            return ret;
         }
 
         // Assign port pair values (x, y) to port pair params array and increment number of port pairs.
@@ -216,7 +238,10 @@ int dpdkc_parse_arg_port_pair_config(const char *arg)
     // Assign port pair array to port pair params.
     port_pair_params = port_pair_params_array;
 
-    return 0;
+    // Success!
+    ret.err_num = 0;
+
+    return ret;
 }
 
 /**
@@ -247,10 +272,20 @@ unsigned int dpdkc_parse_arg_queues(const char *arg)
 /**
  * Checks the port pair config after initialization.
  * 
- * @return 0 on success or -1 on error.
+ * @return The DPDKC error structure (struct dpdkc_error).
 **/
-int dpdkc_check_port_pair_config(void)
+struct dpdkc_error dpdkc_check_port_pair_config(void)
 {
+    // Initialize return variable (custom error).
+    struct dpdkc_error ret = 
+    {
+        .err_num = 0,
+        .gen_msg = NULL,
+        .port_id = -1,
+        .rx_id = -1,
+        .tx_id = -1
+    };
+
     // Port pair config mask and port pair mask.
     __u32 ppcm;
     __u32 ppm;
@@ -273,17 +308,21 @@ int dpdkc_check_port_pair_config(void)
             // Check if this port is enabled via the port mask.
             if (enabled_port_mask & (1 << port_id) == 0)
             {
-                fprintf(stderr, "Port #%u is not enabled through port mask.\n", port_id);
+                ret.err_num = -1;
+                ret.port_id = port_id;
+                ret.gen_msg = "Port is not enabled in port mask.";
 
-                return -1;
+                return ret;
             }
 
             // Check if the port is valid.
             if (!rte_eth_dev_is_valid_port(port_id))
             {
-                fprintf(stderr, "Port %u is not valid.\n", port_id);
+                ret.err_num = -1;
+                ret.port_id = port_id;
+                ret.gen_msg = "Port is not valid.";
 
-                return -1;
+                return ret;
             }
 
             // Retrieve port pair mask.
@@ -293,9 +332,11 @@ int dpdkc_check_port_pair_config(void)
         // Check if this port is being used in another pair since we OR the current PPM to the PPCM variable.
         if (ppcm & ppm)
         {
-            fprintf(stderr, "Port %u is used in other port pairs.\n", port_id);
+            ret.err_num = -1;
+            ret.port_id = port_id;
+            ret.gen_msg = "Port is being used by another port pair.";
 
-            return -1;
+            return ret;
         }
 
         // OR PPM to PPCM so we can perform check above to ensure this port ID isn't in use with another port pair.
@@ -305,7 +346,10 @@ int dpdkc_check_port_pair_config(void)
     // Set global enabled port mask variable for use elsewhere and return 0 for success.
     enabled_port_mask &= ppcm;
 
-    return 0;
+    // Return for success!
+    ret.err_num = 0;
+
+    return ret;
 }
 
 /**
@@ -451,7 +495,7 @@ int dpdkc_check_port_pairs()
         return 0;
     }
 
-    return dpdkc_check_port_pair_config();
+    return dpdkc_check_port_pair_config().err_num;
 }
 
 /**
@@ -626,11 +670,19 @@ int dpdkc_create_mbuf()
  * @param rx_queue The amount of RX queues per port (recommend setting to 1).
  * @param tx_queue The amount of TX queues per port (recommend setting to 1).
  * 
- * @return 0 on success or error codes of function calls.
+ * @return The DPDKC error structure (struct dpdkc_error).
 **/
-int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
+struct dpdkc_error dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
 {
-    int ret = 0;
+    // Initialize return variable (custom error).
+    struct dpdkc_error ret = 
+    {
+        .err_num = 0,
+        .gen_msg = NULL,
+        .port_id = -1,
+        .rx_id = -1,
+        .tx_id = -1
+    };
 
     RTE_ETH_FOREACH_DEV(port_id)
     {
@@ -656,8 +708,11 @@ int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
         fflush(stdout);
 
         // Attempt to receive device information for this specific port and check.
-        if ((ret = rte_eth_dev_info_get(port_id, &dev_info)) != 0)
+        if ((ret.err_num = rte_eth_dev_info_get(port_id, &dev_info)) != 0)
         {
+            ret.port_id = port_id;
+            ret.gen_msg = "Failed to retrieve device info.";
+
             return ret;
         }
 
@@ -667,15 +722,21 @@ int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
             local_port_conf.txmode.offloads |= RTE_ETH_TX_OFFLOAD_MBUF_FAST_FREE;
         }
 
-        // Configure the queue for this port.
-        if ((ret = rte_eth_dev_configure(port_id, rx_queue, tx_queue, &local_port_conf)) < 0)
+        // Configure the queues for this port.
+        if ((ret.err_num = rte_eth_dev_configure(port_id, rx_queue, tx_queue, &local_port_conf)) < 0)
         {
+            ret.port_id = port_id;
+            ret.gen_msg = "Failed to configure ethernet device with RX and TX queues.";
+
             return ret;
         }
 
         // Retrieve MAC address of device and store in array.
-        if ((ret = rte_eth_macaddr_get(port_id, &ports_eth[port_id])) < 0)
+        if ((ret.err_num = rte_eth_macaddr_get(port_id, &ports_eth[port_id])) < 0)
         {
+            ret.port_id = port_id;
+            ret.gen_msg = "Failed to retrieve MAC address on port.";
+
             return ret;
         }
 
@@ -691,8 +752,12 @@ int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
             rxq_conf.offloads = local_port_conf.rxmode.offloads;
 
             // Setup the RX queue and check.
-            if ((ret = rte_eth_rx_queue_setup(port_id, i, nb_rxd, rte_eth_dev_socket_id(port_id), &rxq_conf, pcktmbuf_pool)) < 0)
+            if ((ret.err_num = rte_eth_rx_queue_setup(port_id, i, nb_rxd, rte_eth_dev_socket_id(port_id), &rxq_conf, pcktmbuf_pool)) < 0)
             {
+                ret.port_id = port_id;
+                ret.rx_id = i;
+                ret.gen_msg = "Failed to setup RX queue.";
+
                 return ret;
             }
         }
@@ -708,8 +773,12 @@ int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
             txq_conf = dev_info.default_txconf;
             txq_conf.offloads = local_port_conf.txmode.offloads;
             // Setup the TX queue and check.
-            if ((ret = rte_eth_tx_queue_setup(port_id, i, nb_txd, rte_eth_dev_socket_id(port_id), &txq_conf)) < 0)
+            if ((ret.err_num = rte_eth_tx_queue_setup(port_id, i, nb_txd, rte_eth_dev_socket_id(port_id), &txq_conf)) < 0)
             {
+                ret.port_id = port_id;
+                ret.tx_id = i;
+                ret.gen_msg = "Failed to setup TX queue.";
+
                 return ret;
             }
         }
@@ -720,35 +789,51 @@ int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
         // Check if the TX buffer allocation was successful.
         if (tx_buffer[port_id] == NULL)
         {
-            return -1;
+            ret.err_num = -1;
+            ret.port_id = port_id;
+            ret.gen_msg = "Failed to allocate TX buffer.";
+
+            return ret;
         }
 
         // Initialize the buffer itself within TX and check its result.
         rte_eth_tx_buffer_init(tx_buffer[port_id], MAX_PCKT_BURST);
 
-        if ((ret = rte_eth_tx_buffer_set_err_callback(tx_buffer[port_id], rte_eth_tx_buffer_count_callback, NULL)) < 0)
+        if ((ret.err_num = rte_eth_tx_buffer_set_err_callback(tx_buffer[port_id], rte_eth_tx_buffer_count_callback, NULL)) < 0)
         {
+            ret.port_id = port_id;
+            ret.gen_msg = "Failed to setup TX buffer callback.";
+
             return ret;
         }
 
         // We'll want to disable PType parsing.
-        if ((ret = rte_eth_dev_set_ptypes(port_id, RTE_PTYPE_UNKNOWN, NULL, 0)) < 0)
+        if ((ret.err_num = rte_eth_dev_set_ptypes(port_id, RTE_PTYPE_UNKNOWN, NULL, 0)) < 0)
         {
+            ret.port_id = port_id;
+            ret.gen_msg = "Failed to disable PType parsing for performance.";
+
             return ret;
         }
 
         // Start the device itself.
-        if ((ret = rte_eth_dev_start(port_id)) < 0)
+        if ((ret.err_num = rte_eth_dev_start(port_id)) < 0)
         {
-            rte_exit(EXIT_FAILURE, "Failed to start Ethernet device for port #%u.\n", port_id);
+            ret.port_id = port_id;
+            ret.gen_msg = "Failed to start device.";
+
+            return ret;
         }
 
         // Check for promiscuous mode.
         if (promisc)
         {
             // If we aren't able to enable promiscuous mode, error out.
-            if ((ret = rte_eth_promiscuous_enable(port_id)) < 0)
+            if ((ret.err_num = rte_eth_promiscuous_enable(port_id)) < 0)
             {
+                ret.port_id = port_id;
+                ret.gen_msg = "Failed to enable promiscuous mode on port.";
+
                 return ret;
             }
         }
@@ -758,7 +843,9 @@ int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
     }
 
     // We're done!
-    return 0;
+    ret.err_num = 0;
+
+    return ret;
 }
 
 /**
