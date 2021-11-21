@@ -857,14 +857,13 @@ int dpdkc_ports_available()
 }
 
 /**
- * Initializes the DPDK application's EAL.
+ * Launches the DPDK application and waits for all l-cores to exit.
  * 
  * @param f A pointer to the function to launch on all l-cores when ran.
- * @param argv Pointer to arguments array.
  * 
  * @return Void
 **/
-void dpdkc_launch_and_run(int (*f))
+void dpdkc_launch_and_run(void *f)
 {
     // Launch the application on each l-core.
     rte_eal_mp_remote_launch((int (*)(void *))f, NULL, CALL_MAIN);

@@ -100,7 +100,7 @@ int dpdkc_ports_queues_mapping();
 int dpdkc_create_mbuf();
 struct dpdkc_error dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
 int dpdkc_ports_available();
-void dpdkc_launch_and_run(int (*f));
+void dpdkc_launch_and_run(void *f);
 int dpdkc_port_stop_and_remove();
 int dpdkc_eal_cleanup();
 void dpdkc_check_error(struct dpdkc_error *err);
