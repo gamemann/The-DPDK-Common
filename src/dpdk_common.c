@@ -921,3 +921,19 @@ int dpdkc_eal_cleanup()
 {
     return rte_eal_cleanup();
 }
+
+/**
+ * Checks error from dpdkc_error structure and prints error along with exits if found.
+ * 
+ * @return Void
+**/
+void dpdkc_check_error(struct dpdkc_error *err)
+{
+    if (err->err_num != 0)
+    {
+        char msg[256];
+        snprintf(msg, sizeof(msg) - 1, "%s Error => %s (%d).\n", (err->gen_msg != NULL) ? err->gen_msg : "N/A", strerror(-err->err_num), err->err_num);
+
+        rte_exit(EXIT_FAILURE, msg);
+    }
+}

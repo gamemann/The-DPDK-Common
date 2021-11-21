@@ -103,4 +103,5 @@ int dpdkc_ports_available();
 void dpdkc_launch_and_run(int (*f));
 int dpdkc_port_stop_and_remove();
 int dpdkc_eal_cleanup();
+void dpdkc_check_error(struct dpdkc_error *err);
 #endif
