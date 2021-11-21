@@ -23,8 +23,8 @@ __u16 nb_txd = RTE_TX_DESC_DEFAULT;
 // Array to store the MAC addresses of all ports.
 struct rte_ether_addr ports_eth[RTE_MAX_ETHPORTS];
 
-// The port mask that is enabled.
-__u32 enabled_portmask = 0;
+// The enabled port mask.
+__u32 enabled_port_mask = 0;
 
 // Destination ports array.
 __u32 dst_ports[RTE_MAX_ETHPORTS];
@@ -247,7 +247,7 @@ int dpdkc_check_port_pair_config(void)
             port_id = port_pair_params[index].port[i];
 
             // Check if this port is enabled via the port mask.
-            if (enabled_portmask & (1 << port_id) == 0)
+            if (enabled_port_mask & (1 << port_id) == 0)
             {
                 fprintf(stderr, "Port #%u is not enabled through port mask.\n", port_id);
 
@@ -279,7 +279,7 @@ int dpdkc_check_port_pair_config(void)
     }
 
     // Set global enabled port mask variable for use elsewhere and return 0 for success.
-    enabled_portmask &= ppcm;
+    enabled_port_mask &= ppcm;
 
     return 0;
 }
