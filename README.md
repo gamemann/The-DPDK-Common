@@ -54,11 +54,9 @@ struct dpdkc_error dpdkc_check_port_pair_config(void)
 /**
  * Checks and prints the status of all running ports.
  * 
- * @param port_mask The enabled port mask.
- * 
  * @return Void
 **/
-void dpdkc_check_link_status(__u32 port_mask);
+void dpdkc_check_link_status();
 
 /**
  * Initializes the DPDK application's EAL.
