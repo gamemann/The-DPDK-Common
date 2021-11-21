@@ -53,7 +53,7 @@ struct lcore_queue_conf
 } __rte_cache_aligned;
 
 /* Global variables for use in other objects/executables using this header file */
-#ifndef DPDK_COMMON
+#ifndef DPDK_COMMON_IGNORE_GLOBAL_VARS
 extern volatile __u8 quit;
 extern __u16 nb_rxd;
 extern __u16 nb_txd;
@@ -68,6 +68,14 @@ extern struct lcore_queue_conf lcore_queue_conf[RTE_MAX_LCORE];
 extern struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS];
 extern struct rte_eth_conf port_conf;
 extern struct rte_mempool *pcktmbuf_pool;
+extern __u16 last_port;
+extern __u16 port_id;
+extern __u16 nb_ports;
+extern __u16 nb_ports_available;
+extern unsigned int lcore_id;
+extern unsigned int rx_lcore_id;
+extern unsigned nb_ports_in_mask;
+extern unsigned int nb_lcores;
 #endif
 
 /* Functions for use in other objects/executables using this header file */
