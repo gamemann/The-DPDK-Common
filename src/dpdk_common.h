@@ -93,5 +93,5 @@ int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
 int dpdkc_ports_available();
 void dpdkc_launch_and_run(int (*f));
 int dpdkc_port_stop_and_remove();
-void dpdkc_eal_cleanup();
+int dpdkc_eal_cleanup();
 #endif
