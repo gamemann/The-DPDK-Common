@@ -14,7 +14,7 @@ I have other projects in the pipeline that'll use DPDK Common once I implement a
 * [Examples/Tests](https://github.com/gamemann/The-DPDK-Examples) - A repository I'm using to store examples and tests of the DPDK while I learn it.
 
 ## Functions
-Including the `src/dpdk_common.h` header in a source or another header file will additionally include general header files from the DPDK. With that said, it will allow you to use the following functions which are a part of the DPDK common project.
+Including the `src/dpdk_common.h` header in a source or another header file will additionally include general header files from the DPDK. With that said, it will allow you to use the following functions which are a part of the DPDK Common project.
 
 ```C
 /**
