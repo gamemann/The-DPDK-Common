@@ -182,7 +182,7 @@ struct dpdkc_ret dpdkc_eal_cleanup()
  * 
  * @return Void
 **/
-void dpdkc_check_error(struct dpdkc_error *err)
+void dpdkc_check_ret(struct dpdkc_error *err)
 ```
 
 ## Global Variables
