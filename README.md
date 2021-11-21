@@ -13,6 +13,25 @@ I have other projects in the pipeline that'll use DPDK Common once I implement a
 
 * [Examples/Tests](https://github.com/gamemann/The-DPDK-Examples) - A repository I'm using to store examples and tests of the DPDK while I learn it.
 
+## The Custom Return Structure
+This project uses a custom return structure for functions returning values (non-void). The name of the structure is `dpdkc_ret`.
+
+```C
+struct dpdkc_ret
+{
+    char *gen_msg;
+    int err_num;
+    int port_id;
+    int rx_id;
+    int tx_id;
+    void *data;
+};
+```
+
+With that said, the function `dpdkc_check_error(struct dpdkc_ret *ret)` checks for an error in the structure and exits the application with debugging information if there is an error found (`!= 0`).
+
+Any data from the functions returning this structure should be stored in the `data` pointer. You will need to cast when using this data in the application since it is of type `void *`.
+
 ## Functions
 Including the `src/dpdk_common.h` header in a source or another header file will additionally include general header files from the DPDK. With that said, it will allow you to use the following functions which are a part of the DPDK Common project.
 
@@ -22,34 +41,34 @@ Including the `src/dpdk_common.h` header in a source or another header file will
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return Returns the port mask.
+ * @return The DPDK Common return structure (struct dpdkc_ret). The port mask is stored in ret->data.
 **/
-unsigned long dpdkc_parse_arg_port_mask(const char *arg);
+struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg)
 
 /**
- * Parses the port pair config.
+ * Parses the port pair config argument.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return The DPDKC error structure (struct dpdkc_error).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_error dpdkc_parse_arg_port_pair_config(const char *arg)
+struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg)
 
 /**
  * Parses the queue number argument.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return Returns the amount of queues.
+ * @return The DPDK Common return structure (struct dpdkc_ret). The amount of queues is stored in ret->data.
 **/
-unsigned int dpdkc_parse_arg_queues(const char *arg);
+struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg)
 
 /**
  * Checks the port pair config after initialization.
  * 
- * @return The DPDKC error structure (struct dpdkc_error).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_error dpdkc_check_port_pair_config(void)
+struct dpdkc_ret dpdkc_check_port_pair_config(void)
 
 /**
  * Checks and prints the status of all running ports.
@@ -64,30 +83,30 @@ void dpdkc_check_link_status();
  * @param argc The argument count.
  * @param argv Pointer to arguments array.
  * 
- * @return Return value of rte_eal_init().
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_eal_init(int argc, char **argv);
+struct dpdkc_ret dpdkc_eal_init(int argc, char **argv)
 
 /**
  * Retrieves the amount of ports available.
  * 
- * @return The amount of ports available.
+ * @return The DPDK Common return structure (struct dpdkc_ret). Number of available ports are stored inside of ret->data.
 **/
-unsigned short dpdkc_get_nb_ports();
+struct dpdkc_ret dpdkc_get_nb_ports()
 
 /**
  * Checks all port pairs.
  * 
- * @return 0 on success or -1 on failure.
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_check_port_pairs();
+struct dpdkc_ret dpdkc_check_port_pairs()
 
 /**
  * Checks all ports against port mask.
  * 
- * @return 0 on success or -1 on failure.
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_ports_are_valid();
+struct dpdkc_ret dpdkc_ports_are_valid()
 
 /**
  * Resets all destination ports.
@@ -97,7 +116,7 @@ int dpdkc_ports_are_valid();
 void dpdkc_reset_dst_ports();
 
 /**
- * Populations all destination ports.
+ * Populates all destination ports.
  * 
  * @return Void
 **/
@@ -106,16 +125,16 @@ void dpdkc_populate_dst_ports();
 /**
  * Maps ports and queues to each l-core.
  * 
- * @return 0 on success or -1 on error (l-core count exceeds max l-cores configured).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_ports_queues_mapping();
+struct dpdkc_ret dpdkc_ports_queues_mapping()
 
 /**
  * Creates the packet's mbuf pool.
  * 
- * @return 0 on success or -1 on error (allocation failed).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_create_mbuf();
+struct dpdkc_ret dpdkc_create_mbuf()
 
 /**
  * Initializes all ports and RX/TX queues.
@@ -124,16 +143,16 @@ int dpdkc_create_mbuf();
  * @param rx_queue The amount of RX queues per port (recommend setting to 1).
  * @param tx_queue The amount of TX queues per port (recommend setting to 1).
  * 
- * @return The DPDKC error structure (struct dpdkc_error).
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_error dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
+struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
 
 /**
  * Check if the number of available ports is above one.
  * 
- * @return 1 on available or 0 for none available.
+ * @return The DPDK Common return structure (struct dpdkc_ret). The amount of available ports is returned in ret->data.
 **/
-int dpdkc_ports_available();
+struct dpdkc_ret dpdkc_ports_available()
 
 /**
  * Launches the DPDK application and waits for all l-cores to exit.
@@ -147,16 +166,16 @@ void dpdkc_launch_and_run(void *f);
 /**
  * Stops and removes all running ports.
  * 
- * @return 0 on success or return value of rte_eth_dev_stop() on error.
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_port_stop_and_remove();
+struct dpdkc_ret dpdkc_port_stop_and_remove()
 
 /**
  * Cleans up the DPDK application's EAL.
  * 
- * @return Return value of rte_eal_cleanup().
+ * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-int dpdkc_eal_cleanup();
+struct dpdkc_ret dpdkc_eal_cleanup()
 
 /**
  * Checks error from dpdkc_error structure and prints error along with exits if found.
