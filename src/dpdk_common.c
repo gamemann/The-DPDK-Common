@@ -64,11 +64,11 @@ struct rte_eth_conf port_conf =
 struct rte_mempool *pcktmbuf_pool = NULL;
 
 /**
- * Parses the port mask argument
+ * Parses the port mask argument.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return The port mask
+ * @return Returns the port mask.
  */
 unsigned long dpdkc_parse_arg_port_mask(const char *arg)
 {
@@ -196,7 +196,7 @@ int dpdkc_parse_arg_port_pair_config(const char *arg)
 }
 
 /**
- * Parses the queue number argument
+ * Parses the queue number argument.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
