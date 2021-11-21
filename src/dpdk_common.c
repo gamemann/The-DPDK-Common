@@ -63,9 +63,6 @@ struct rte_eth_conf port_conf =
 // A pointer to the mbuf_pool for packets.
 struct rte_mempool *pcktmbuf_pool = NULL;
 
-// Last port.
-__u16 last_port = 0;
-
 // The current port ID.
 __u16 port_id = 0;
 
@@ -479,9 +476,6 @@ void dpdkc_reset_dst_ports()
     {
         dst_ports[port_id] = 0;
     }
-
-    // Set last port to 0 since we've reset destination ports.
-    last_port = 0;
 }
 
 /**
@@ -493,6 +487,9 @@ void dpdkc_populate_dst_ports()
 {
     // Number of ports in a mask.
     unsigned nb_ports_in_mask = 0;
+
+    // The last port used.
+    __u16 last_port = 0;
 
     // Check port pair params first.
     if (port_pair_params != NULL)

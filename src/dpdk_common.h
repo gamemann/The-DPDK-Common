@@ -68,7 +68,6 @@ extern struct lcore_queue_conf lcore_queue_conf[RTE_MAX_LCORE];
 extern struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS];
 extern struct rte_eth_conf port_conf;
 extern struct rte_mempool *pcktmbuf_pool;
-extern __u16 last_port;
 extern __u16 port_id;
 extern __u16 nb_ports;
 extern __u16 nb_ports_available;
