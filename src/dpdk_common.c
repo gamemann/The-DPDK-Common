@@ -440,7 +440,7 @@ int dpdkc_eal_init(int argc, char **argv)
  * 
  * @return The amount of ports available.
 **/
-static unsigned short dpdkc_get_nb_ports()
+unsigned short dpdkc_get_nb_ports()
 {
     return rte_eth_dev_count_avail();
 }
