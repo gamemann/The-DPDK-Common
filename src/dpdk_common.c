@@ -1004,7 +1004,7 @@ struct dpdkc_ret dpdkc_eal_cleanup()
  * 
  * @return Void
 **/
-void dpdkc_check_error(struct dpdkc_ret *ret)
+void dpdkc_check_ret(struct dpdkc_ret *ret)
 {
     if (ret->err_num != 0)
     {
