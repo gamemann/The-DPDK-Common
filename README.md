@@ -158,6 +158,13 @@ int dpdkc_port_stop_and_remove();
  * @return Return value of rte_eal_cleanup().
 **/
 int dpdkc_eal_cleanup();
+
+/**
+ * Checks error from dpdkc_error structure and prints error along with exits if found.
+ * 
+ * @return Void
+**/
+void dpdkc_check_error(struct dpdkc_error *err);
 ```
 
 ## Global Variables
