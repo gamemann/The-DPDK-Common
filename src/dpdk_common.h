@@ -48,8 +48,8 @@ struct port_pair_params
 
 struct lcore_queue_conf
 {
-    unsigned numrxport;
-    unsigned rxportlist[MAX_RX_QUEUE_PER_LCORE];
+    unsigned num_rx_ports;
+    unsigned rx_port_list[MAX_RX_QUEUE_PER_LCORE];
 } __rte_cache_aligned;
 
 struct dpdkc_ret

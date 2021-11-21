@@ -672,7 +672,7 @@ struct dpdkc_ret dpdkc_ports_queues_mapping()
         }
 
         // Retrieve the l-core ID.
-        while (rte_lcore_is_enabled(rx_lcore_id) == 0 || lcore_queue_conf[rx_lcore_id].numrxport == rx_queue_pl)
+        while (rte_lcore_is_enabled(rx_lcore_id) == 0 || lcore_queue_conf[rx_lcore_id].num_rx_ports == rx_queue_pl)
         {
             // Increment the lcore ID.
             rx_lcore_id++;
@@ -696,9 +696,9 @@ struct dpdkc_ret dpdkc_ports_queues_mapping()
             nb_lcores++;
         }
 
-        // Assign port_id to port list at qconf->numrxport index and increase RX port count.
-        qconf->rxportlist[qconf->numrxport] = port_id;
-        qconf->numrxport++;
+        // Assign port_id to port list at qconf->num_rx_ports index and increase RX port count.
+        qconf->rx_port_list[qconf->num_rx_ports] = port_id;
+        qconf->num_rx_ports++;
 
         // Print verbose message.
         fprintf(stdout, "Setting up l-core #%u with RX port %u and TX port %u.\n", rx_lcore_id, port_id, dst_ports[port_id]);
