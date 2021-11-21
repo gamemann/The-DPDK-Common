@@ -31,9 +31,9 @@ unsigned long dpdkc_parse_arg_port_mask(const char *arg);
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
- * @return 0 on success and -1 on error.
+ * @return The DPDKC error structure (struct dpdkc_error).
 **/
-int dpdkc_parse_arg_port_pair_config(const char *arg);
+struct dpdkc_error dpdkc_parse_arg_port_pair_config(const char *arg)
 
 /**
  * Parses the queue number argument.
@@ -47,9 +47,9 @@ unsigned int dpdkc_parse_arg_queues(const char *arg);
 /**
  * Checks the port pair config after initialization.
  * 
- * @return 0 on success or -1 on error.
+ * @return The DPDKC error structure (struct dpdkc_error).
 **/
-int dpdkc_check_port_pair_config(void);
+struct dpdkc_error dpdkc_check_port_pair_config(void)
 
 /**
  * Checks and prints the status of all running ports.
@@ -126,9 +126,9 @@ int dpdkc_create_mbuf();
  * @param rx_queue The amount of RX queues per port (recommend setting to 1).
  * @param tx_queue The amount of TX queues per port (recommend setting to 1).
  * 
- * @return 0 on success or error codes of function calls.
+ * @return The DPDKC error structure (struct dpdkc_error).
 **/
-int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
+struct dpdkc_error dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
 
 /**
  * Check if the number of available ports is above one.
