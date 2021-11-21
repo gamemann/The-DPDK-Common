@@ -491,11 +491,16 @@ struct dpdkc_ret dpdkc_eal_init(int argc, char **argv)
     // Create DPDK Common's return structure.
     struct dpdkc_ret ret = dpdkc_ret_init();
 
-    ret.err_num = rte_eal_init(argc, argv);
+    int tmp = rte_eal_init(argc, argv);
 
-    if (ret.err_num != 0)
+    if (tmp < 0)
     {
+        ret.err_num = -1;
         ret.gen_msg = "Failed to initialize EAL.";
+    }
+    else
+    {
+        ret.data = (void *)&tmp;
     }
 
     return ret;
