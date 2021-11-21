@@ -913,7 +913,7 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue
 /**
  * Check if the number of available ports is above one.
  * 
- * @return The DPDK Common return structure (struct dpdkc_ret).. The amount of available ports is returned in ret->data.
+ * @return The DPDK Common return structure (struct dpdkc_ret). The amount of available ports is returned in ret->data.
 **/
 struct dpdkc_ret dpdkc_ports_available()
 {
