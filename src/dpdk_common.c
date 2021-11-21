@@ -770,6 +770,7 @@ struct dpdkc_error dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_que
 
             txq_conf = dev_info.default_txconf;
             txq_conf.offloads = local_port_conf.txmode.offloads;
+
             // Setup the TX queue and check.
             if ((ret.err_num = rte_eth_tx_queue_setup(port_id, i, nb_txd, rte_eth_dev_socket_id(port_id), &txq_conf)) < 0)
             {
@@ -931,7 +932,7 @@ void dpdkc_check_error(struct dpdkc_error *err)
     if (err->err_num != 0)
     {
         char msg[256];
-        snprintf(msg, sizeof(msg) - 1, "%s Error => %s (%d).\n", (err->gen_msg != NULL) ? err->gen_msg : "N/A", strerror(-err->err_num), err->err_num);
+        snprintf(msg, sizeof(msg) - 1, "%s Port ID => %d. RX queue ID => %d. TX queue ID => %d. Error => %s (%d).\n", (err->gen_msg != NULL) ? err->gen_msg : "N/A", err->port_id, err->rx_id, err->tx_id, strerror(-err->err_num), err->err_num);
 
         rte_exit(EXIT_FAILURE, "%s", msg);
     }
