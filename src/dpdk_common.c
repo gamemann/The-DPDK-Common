@@ -84,7 +84,7 @@ unsigned int nb_lcores = 0;
 **/
 static int dpdkc_port_enabled()
 {
-    return (enabled_portmask & (1 << port_id)) > 0;
+    return (enabled_port_mask & (1 << port_id)) > 0;
 }
 
 /**
@@ -503,7 +503,7 @@ int dpdkc_check_port_pairs()
 **/
 int dpdkc_ports_are_valid()
 {
-    return !(enabled_portmask & ~((1 << nb_ports) - 1));
+    return !(enabled_port_mask & ~((1 << nb_ports) - 1));
 }
 
 /**

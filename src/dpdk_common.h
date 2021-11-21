@@ -67,7 +67,7 @@ extern volatile __u8 quit;
 extern __u16 nb_rxd;
 extern __u16 nb_txd;
 extern struct rte_ether_addr ports_eth[RTE_MAX_ETHPORTS];
-extern __u32 enabled_portmask;
+extern __u32 enabled_port_mask;
 extern __u32 dst_ports[RTE_MAX_ETHPORTS];
 extern struct port_pair_params port_pair_params_array[RTE_MAX_ETHPORTS / 2];
 extern struct port_pair_params *port_pair_params;
