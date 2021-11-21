@@ -75,7 +75,7 @@ struct dpdkc_ret dpdkc_check_port_pair_config(void)
  * 
  * @return Void
 **/
-void dpdkc_check_link_status();
+void dpdkc_check_link_status()
 
 /**
  * Initializes the DPDK application's EAL.
@@ -113,14 +113,14 @@ struct dpdkc_ret dpdkc_ports_are_valid()
  * 
  * @return Void
 **/
-void dpdkc_reset_dst_ports();
+void dpdkc_reset_dst_ports()
 
 /**
  * Populates all destination ports.
  * 
  * @return Void
 **/
-void dpdkc_populate_dst_ports();
+void dpdkc_populate_dst_ports()
 
 /**
  * Maps ports and queues to each l-core.
@@ -161,7 +161,7 @@ struct dpdkc_ret dpdkc_ports_available()
  * 
  * @return Void
 **/
-void dpdkc_launch_and_run(void *f);
+void dpdkc_launch_and_run(void *f)
 
 /**
  * Stops and removes all running ports.
@@ -182,7 +182,7 @@ struct dpdkc_ret dpdkc_eal_cleanup()
  * 
  * @return Void
 **/
-void dpdkc_check_error(struct dpdkc_error *err);
+void dpdkc_check_error(struct dpdkc_error *err)
 ```
 
 ## Global Variables
