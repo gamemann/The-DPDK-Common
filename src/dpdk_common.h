@@ -76,4 +76,17 @@ int dpdkc_parse_arg_port_pair_config(const char *arg);
 unsigned int dpdkc_parse_arg_queues(const char *arg);
 int dpdkc_check_port_pair_config(void);
 void dpdkc_check_link_status(__u32 port_mask);
+int dpdkc_eal_init(int argc, char **argv);
+static unsigned short dpdkc_get_nb_ports();
+int dpdkc_check_port_pairs();
+int dpdkc_ports_are_valid();
+void dpdkc_reset_dst_ports();
+void dpdkc_populate_dst_ports();
+int dpdkc_ports_queues_mapping();
+int dpdkc_create_mbuf();
+int dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
+int dpdkc_ports_available();
+void dpdkc_launch_and_run(int (*f));
+int dpdkc_port_stop_and_remove();
+void dpdkc_eal_cleanup();
 #endif
