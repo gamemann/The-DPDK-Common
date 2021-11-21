@@ -28,7 +28,7 @@ struct dpdkc_ret
 };
 ```
 
-With that said, the function `dpdkc_check_error(struct dpdkc_ret *ret)` checks for an error in the structure and exits the application with debugging information if there is an error found (`!= 0`).
+With that said, the function `dpdkc_check_ret(struct dpdkc_ret *ret)` checks for an error in the structure and exits the application with debugging information if there is an error found (`!= 0`).
 
 Any data from the functions returning this structure should be stored in the `data` pointer. You will need to cast when using this data in the application since it is of type `void *`.
 
@@ -228,12 +228,12 @@ struct rte_eth_conf port_conf =
 {
     .rxmode =
     {
-        .split_hdr_size = 1,
+        .split_hdr_size = 1
     },
     .rxmode =
     {
-        .mq_mode = RTE_ETH_MQ_TX_NONE,
-    },
+        .mq_mode = RTE_ETH_MQ_TX_NONE
+    }
 };
 
 // A pointer to the mbuf_pool for packets.
