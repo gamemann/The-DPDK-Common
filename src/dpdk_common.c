@@ -925,7 +925,7 @@ struct dpdkc_ret dpdkc_ports_available()
     // Create DPDK Common's return structure.
     struct dpdkc_ret ret = dpdkc_ret_init();
 
-    ret.err_num = nb_ports_available > 0;
+    ret.err_num = !(nb_ports_available > 0);
     ret.data = nb_ports_available;
 
     return ret;
