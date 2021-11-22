@@ -868,14 +868,6 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue
         // Initialize the buffer itself within TX and check its result.
         rte_eth_tx_buffer_init(tx_buffer[port_id], MAX_PCKT_BURST);
 
-        if ((ret.err_num = rte_eth_tx_buffer_set_err_callback(tx_buffer[port_id], rte_eth_tx_buffer_count_callback, NULL)) < 0)
-        {
-            ret.port_id = port_id;
-            ret.gen_msg = "Failed to setup TX buffer callback.";
-
-            return ret;
-        }
-
         // We'll want to disable PType parsing.
         if ((ret.err_num = rte_eth_dev_set_ptypes(port_id, RTE_PTYPE_UNKNOWN, NULL, 0)) < 0)
         {
