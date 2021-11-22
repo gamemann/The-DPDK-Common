@@ -921,6 +921,13 @@ struct dpdkc_ret dpdkc_ports_available()
     struct dpdkc_ret ret = dpdkc_ret_init();
 
     ret.err_num = !(nb_ports_available > 0);
+
+    // Check.
+    if (ret.err_num != 0)
+    {
+        ret.gen_msg = "Number of available ports is 0. Make sure port mask is set correctly.";
+    }
+
     ret.data = nb_ports_available;
 
     return ret;
