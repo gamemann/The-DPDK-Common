@@ -24,7 +24,8 @@ struct dpdkc_ret
     int port_id;
     int rx_id;
     int tx_id;
-    void *data;
+    __u32 data;
+    void *dataptr;
 };
 ```
 
@@ -36,6 +37,13 @@ Any data from the functions returning this structure should be stored in the `da
 Including the `src/dpdk_common.h` header in a source or another header file will additionally include general header files from the DPDK. With that said, it will allow you to use the following functions which are a part of the DPDK Common project.
 
 ```C
+/**
+ * Initializes a DPDK Common result type and returns it with default values.
+ * 
+ * @return The DPDK Common return structure (struct dpdkc_ret) with its default values.
+**/
+struct dpdkc_ret dpdkc_ret_init()
+
 /**
  * Parses the port mask argument.
  * 
