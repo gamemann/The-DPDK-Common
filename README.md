@@ -42,7 +42,7 @@ Including the `src/dpdk_common.h` header in a source or another header file will
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret) with its default values.
 **/
-struct dpdkc_ret dpdkc_ret_init()
+struct dpdkc_ret dpdkc_ret_init();
 
 /**
  * Parses the port mask argument.
@@ -51,7 +51,7 @@ struct dpdkc_ret dpdkc_ret_init()
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret). The port mask is stored in ret->data.
 **/
-struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg)
+struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg);
 
 /**
  * Parses the port pair config argument.
@@ -60,7 +60,7 @@ struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg)
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg)
+struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg);
 
 /**
  * Parses the queue number argument.
@@ -69,21 +69,21 @@ struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg)
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret). The amount of queues is stored in ret->data.
 **/
-struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg)
+struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg);
 
 /**
  * Checks the port pair config after initialization.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_check_port_pair_config(void)
+struct dpdkc_ret dpdkc_check_port_pair_config(void);
 
 /**
  * Checks and prints the status of all running ports.
  * 
  * @return Void
 **/
-void dpdkc_check_link_status()
+void dpdkc_check_link_status();
 
 /**
  * Initializes the DPDK application's EAL.
@@ -93,56 +93,56 @@ void dpdkc_check_link_status()
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_eal_init(int argc, char **argv)
+struct dpdkc_ret dpdkc_eal_init(int argc, char **argv);
 
 /**
  * Retrieves the amount of ports available.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret). Number of available ports are stored inside of ret->data.
 **/
-struct dpdkc_ret dpdkc_get_nb_ports()
+struct dpdkc_ret dpdkc_get_nb_ports();
 
 /**
  * Checks all port pairs.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_check_port_pairs()
+struct dpdkc_ret dpdkc_check_port_pairs();
 
 /**
  * Checks all ports against port mask.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_ports_are_valid()
+struct dpdkc_ret dpdkc_ports_are_valid();
 
 /**
  * Resets all destination ports.
  * 
  * @return Void
 **/
-void dpdkc_reset_dst_ports()
+void dpdkc_reset_dst_ports();
 
 /**
  * Populates all destination ports.
  * 
  * @return Void
 **/
-void dpdkc_populate_dst_ports()
+void dpdkc_populate_dst_ports();
 
 /**
  * Maps ports and queues to each l-core.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_ports_queues_mapping()
+struct dpdkc_ret dpdkc_ports_queues_mapping();
 
 /**
  * Creates the packet's mbuf pool.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_create_mbuf()
+struct dpdkc_ret dpdkc_create_mbuf();
 
 /**
  * Initializes all ports and RX/TX queues.
@@ -153,14 +153,14 @@ struct dpdkc_ret dpdkc_create_mbuf()
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
+struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
 
 /**
  * Check if the number of available ports is above one.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret). The amount of available ports is returned in ret->data.
 **/
-struct dpdkc_ret dpdkc_ports_available()
+struct dpdkc_ret dpdkc_ports_available();
 
 /**
  * Launches the DPDK application and waits for all l-cores to exit.
@@ -169,28 +169,28 @@ struct dpdkc_ret dpdkc_ports_available()
  * 
  * @return Void
 **/
-void dpdkc_launch_and_run(void *f)
+void dpdkc_launch_and_run(void *f);
 
 /**
  * Stops and removes all running ports.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_port_stop_and_remove()
+struct dpdkc_ret dpdkc_port_stop_and_remove();
 
 /**
  * Cleans up the DPDK application's EAL.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_eal_cleanup()
+struct dpdkc_ret dpdkc_eal_cleanup();
 
 /**
  * Checks error from dpdkc_error structure and prints error along with exits if found.
  * 
  * @return Void
 **/
-void dpdkc_check_ret(struct dpdkc_error *err)
+void dpdkc_check_ret(struct dpdkc_error *err);
 ```
 
 ## Global Variables
