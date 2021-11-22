@@ -564,11 +564,14 @@ struct dpdkc_ret dpdkc_ports_are_valid()
     // Create DPDK Common's return structure.
     struct dpdkc_ret ret = dpdkc_ret_init();
     
-    ret.err_num = !(enabled_port_mask & ~((1 << nb_ports) - 1));
+    ret.err_num = enabled_port_mask & ~((1 << nb_ports) - 1);
 
     if (ret.err_num != 0)
     {
-        ret.gen_msg = "Number of ports failed against enabled port mask.";
+        char msg[256];
+        snprintf(msg, sizeof(msg) - 1, "Number of ports failed against port mask. Try 0x%x.", (1 << nb_ports) - 1);
+
+        ret.gen_msg = strdup(msg);
     }
 
     return ret;
