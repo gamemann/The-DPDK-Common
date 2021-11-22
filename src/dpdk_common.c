@@ -89,11 +89,10 @@ static int dpdkc_port_enabled()
 
 /**
  * Initializes a DPDK Common result type and returns it with default values.
- * WARNING - Static function (cannot use outside of this file).
  * 
- * @return The DPDK Common return structure (struct dpdkc_ret).
+ * @return The DPDK Common return structure (struct dpdkc_ret) with its default values.
 **/
-static struct dpdkc_ret dpdkc_ret_init()
+struct dpdkc_ret dpdkc_ret_init()
 {
     struct dpdkc_ret ret =
     {

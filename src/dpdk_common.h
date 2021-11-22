@@ -87,6 +87,7 @@ extern unsigned int nb_lcores;
 #endif
 
 /* Functions for use in other objects/executables using this header file */
+struct dpdkc_ret dpdkc_ret_init();
 struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg);
 struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg);
 struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg);
