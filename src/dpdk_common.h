@@ -59,7 +59,8 @@ struct dpdkc_ret
     int port_id;
     int rx_id;
     int tx_id;
-    void *data;
+    __u32 data;
+    void *dataptr;
 };
 
 /* Global variables for use in other objects/executables using this header file */

@@ -102,7 +102,8 @@ static struct dpdkc_ret dpdkc_ret_init()
         .port_id = -1,
         .rx_id = -1,
         .tx_id = -1,
-        .data = NULL
+        .data = -1,
+        .dataptr = NULL
     };
 
     return ret;
@@ -126,7 +127,7 @@ struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg)
     // Parse hexadecimal.
     pm = strtoul(arg, &end, 16);
 
-    ret.data = (void *)&pm;
+    ret.data = pm;
 
     return ret;
 }
@@ -292,7 +293,7 @@ struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg)
         return ret;
     }
 
-    ret.data = (void *)&n;
+    ret.data = n;
 
     return ret;
 }
@@ -500,7 +501,7 @@ struct dpdkc_ret dpdkc_eal_init(int argc, char **argv)
     }
     else
     {
-        ret.data = (void *)&tmp;
+        ret.data = tmp;
     }
 
     return ret;
@@ -525,7 +526,7 @@ struct dpdkc_ret dpdkc_get_nb_ports()
         ret.gen_msg = "No available ports.";
     }
 
-    ret.data = (void *)&num;
+    ret.data = num;
 
     return ret;
 }
@@ -926,7 +927,7 @@ struct dpdkc_ret dpdkc_ports_available()
     struct dpdkc_ret ret = dpdkc_ret_init();
 
     ret.err_num = nb_ports_available > 0;
-    ret.data = (void *)&nb_ports_available;
+    ret.data = nb_ports_available;
 
     return ret;
 }
