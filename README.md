@@ -186,11 +186,11 @@ struct dpdkc_ret dpdkc_port_stop_and_remove();
 struct dpdkc_ret dpdkc_eal_cleanup();
 
 /**
- * Checks error from dpdkc_error structure and prints error along with exits if found.
+ * Checks error from dpdkc_ret structure and prints error along with exits if found.
  * 
  * @return Void
 **/
-void dpdkc_check_ret(struct dpdkc_error *err);
+void dpdkc_check_ret(struct dpdkc_ret *ret);
 ```
 
 ## Global Variables
