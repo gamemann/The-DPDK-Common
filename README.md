@@ -1,4 +1,4 @@
-# The DPDK Common (WIP)
+# The DPDK Common
 ## Description
 This project includes helpful functions and global variables for developing applications using [the DPDK](https://www.dpdk.org/). I am using this for my projects using the DPDK.
 
