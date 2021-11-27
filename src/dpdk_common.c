@@ -1017,7 +1017,6 @@ void dpdkc_check_ret(struct dpdkc_ret *ret)
     }
 }
 
-#ifdef USE_HASH_TABLES
 /**
  * Removes the least recently used item from a regular hash table if the table exceeds max entries.
  * 
@@ -1053,4 +1052,3 @@ int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries)
 
     return 0;
 }
-#endif
