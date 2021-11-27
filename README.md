@@ -193,6 +193,20 @@ struct dpdkc_ret dpdkc_eal_cleanup();
 void dpdkc_check_ret(struct dpdkc_ret *ret);
 ```
 
+The following function(s) are available if `USE_HASH_TABLES` is defined.
+
+```C
+/**
+ * Removes the least recently used item from a regular hash table if the table exceeds max entries.
+ * 
+ * @param tbl A pointer to the hash table.
+ * @param max_entries The max entries in the table.
+ * 
+ * @return 0 on success or -1 on error (failed to delete key from table).
+**/
+int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries);
+```
+
 ## Global Variables
 Additionally, there are useful global variables directed towards aspects of the program for the DPDK. However, these are prefixed with the `extern` tag within the `src/dpdk_common.h` header file allowing you to use them anywhere else assuming the file is included and the object file built from `make` is linked.
 
