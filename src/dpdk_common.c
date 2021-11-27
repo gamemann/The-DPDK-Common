@@ -10,6 +10,8 @@
 #include <getopt.h>
 #include <signal.h>
 
+#define USE_HASH_TABLES
+
 #include "dpdk_common.h"
 
 /* Global variables that may be used in other programs. */
