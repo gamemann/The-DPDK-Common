@@ -1016,3 +1016,41 @@ void dpdkc_check_ret(struct dpdkc_ret *ret)
         rte_exit(EXIT_FAILURE, "%s", msg);
     }
 }
+
+#ifdef USE_HASH_TABLES
+/**
+ * Removes the least recently used item from a regular hash table if the table exceeds max entries.
+ * 
+ * @param tbl A pointer to the hash table.
+ * @param max_entries The max entries in the table.
+ * 
+ * @return 0 on success or -1 on error (failed to delete key from table).
+**/
+int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries)
+{
+    static __u32 cnt = 0;
+    static __u32 pos = 0;
+
+    // Check if the entry count exceeds max entries.
+    if (cnt > max_entries)
+    {
+        // Check if the position needs to be reset.
+        if (pos > (max_entries - 1))
+        {
+            pos = 0;
+        }
+
+        void *key;
+
+        rte_hash_get_key_with_position(tbl, pos, (void **)&key);
+
+        // Try deleting it.
+        if (rte_hash_del_key(tbl, key) < 0)
+        {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+#endif

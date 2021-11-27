@@ -22,6 +22,10 @@
 #include <rte_mempool.h>
 #include <rte_mbuf.h>
 #include <rte_string_fns.h>
+#ifdef USE_HASH_TABLES
+#include <rte_hash.h>
+#include <rte_jhash.h>
+#endif
 
 #include <linux/types.h>
 
@@ -107,4 +111,7 @@ void dpdkc_launch_and_run(void *f);
 struct dpdkc_ret dpdkc_port_stop_and_remove();
 struct dpdkc_ret dpdkc_eal_cleanup();
 void dpdkc_check_ret(struct dpdkc_ret *ret);
+#ifdef USE_HASH_TABLES
+int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries);
+#endif
 #endif
