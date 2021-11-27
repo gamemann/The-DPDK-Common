@@ -1030,26 +1030,46 @@ void dpdkc_check_ret(struct dpdkc_ret *ret)
 int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries)
 {
     static __u32 cnt = 0;
-    static __u32 pos = 0;
+    static __s32 pos = 0;
 
     // Check if the entry count exceeds max entries.
     if (cnt > max_entries)
     {
         // Check if the position needs to be reset.
-        if (pos > (max_entries - 1))
+        if (pos >= (max_entries - 1))
         {
             pos = 0;
         }
 
         void *key;
 
-        rte_hash_get_key_with_position(tbl, pos, (void **)&key);
+        if (rte_hash_get_key_with_position(tbl, pos, (void **)&key))
+        {
+#ifdef DEBUG
+            printf("Failed to get key %u.\n", pos);
+#endif
+        }
 
         // Try deleting it.
         if (rte_hash_del_key(tbl, key) < 0)
         {
+#ifdef DEBUG
+            printf("Failed at %u.\n", pos);
+#endif
+
             return -1;
         }
+
+#ifdef DEBUG
+        printf("Removed at position at %u.\n", pos);
+
+        pos++;
+    }
+#endif
+
+    if (cnt <= max_entries)
+    {
+        cnt++;
     }
 
     return 0;
