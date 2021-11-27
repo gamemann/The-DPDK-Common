@@ -1027,7 +1027,7 @@ void dpdkc_check_ret(struct dpdkc_ret *ret)
  * 
  * @return 0 on success or -1 on error (failed to delete key from table).
 **/
-int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries)
+int check_and_del_lru_from_hash_table(void *tbl, __u32 max_entries)
 {
     static __u32 cnt = 0;
     static __s32 pos = 0;
@@ -1063,6 +1063,7 @@ int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries)
 #ifdef DEBUG
         printf("Removed at position at %u.\n", pos);
 #endif
+
         pos++;
     }
 

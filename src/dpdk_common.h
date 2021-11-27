@@ -112,6 +112,6 @@ struct dpdkc_ret dpdkc_port_stop_and_remove();
 struct dpdkc_ret dpdkc_eal_cleanup();
 void dpdkc_check_ret(struct dpdkc_ret *ret);
 #ifdef USE_HASH_TABLES
-int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries);
+int check_and_del_lru_from_hash_table(void *tbl, __u32 max_entries);
 #endif
 #endif
