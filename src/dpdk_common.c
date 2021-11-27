@@ -1062,10 +1062,9 @@ int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries)
 
 #ifdef DEBUG
         printf("Removed at position at %u.\n", pos);
-
+#endif
         pos++;
     }
-#endif
 
     if (cnt <= max_entries)
     {
