@@ -35,11 +35,11 @@
 #define MEMPOOL_CACHE_SIZE 256
 #define RTE_RX_DESC_DEFAULT 1024
 #define RTE_TX_DESC_DEFAULT 1024
-#define MAX_RX_QUEUE_PER_LCORE 16
-#define MAX_TX_QUEUE_PER_PORT 16
+#define MAX_RX_PORTS_PER_LCORE 16
+#define MAX_TX_PORTS_PER_LCORE 16
+#define MAX_RX_QUEUES_PER_PORT 16
+#define MAX_TX_QUEUES_PER_PORT 16
 #define NUM_PORTS 2
-#define MAX_RX_QUEUE_PER_LCORE 16
-#define MAX_TX_QUEUE_PER_PORT 16
 #define MAX_TIMER_PERIOD 86400
 #define CHECK_INTERVAL 100
 #define MAX_CHECK_TIME 90
@@ -50,11 +50,20 @@ struct port_pair_params
     __u16 port[NUM_PORTS];
 } __rte_cache_aligned;
 
-struct lcore_queue_conf
+struct lcore_port_conf
 {
     unsigned num_rx_ports;
-    unsigned rx_port_list[MAX_RX_QUEUE_PER_LCORE];
+    unsigned rx_port_list[MAX_RX_PORTS_PER_LCORE];
+    unsigned num_tx_ports;
+    unsigned tx_port_list[MAX_TX_PORTS_PER_LCORE];
+    struct rte_ether_addr mac;
 } __rte_cache_aligned;
+
+struct port_conf
+{
+    unsigned int rx : 1;
+    unsigned int tx : 1;
+};
 
 struct dpdkc_ret
 {
@@ -78,8 +87,12 @@ extern __u32 dst_ports[RTE_MAX_ETHPORTS];
 extern struct port_pair_params port_pair_params_array[RTE_MAX_ETHPORTS / 2];
 extern struct port_pair_params *port_pair_params;
 extern __u16 nb_port_pair_params;
-extern unsigned int rx_queue_pl;
-extern struct lcore_queue_conf lcore_queue_conf[RTE_MAX_LCORE];
+extern struct port_conf ports[RTE_MAX_ETHPORTS];
+extern unsigned int rx_port_pl;
+extern unsigned int tx_port_pl;
+extern unsigned int rx_queue_pp;
+extern unsigned int tx_queue_pp;
+extern struct lcore_port_conf lcore_port_conf[RTE_MAX_LCORE];
 extern struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS];
 extern struct rte_eth_conf port_conf;
 extern struct rte_mempool *pcktmbuf_pool;
@@ -94,7 +107,7 @@ extern unsigned int nb_lcores;
 struct dpdkc_ret dpdkc_ret_init();
 struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg);
 struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg);
-struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg);
+struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg, int tx);
 struct dpdkc_ret dpdkc_check_port_pair_config(void);
 void dpdkc_check_link_status();
 struct dpdkc_ret dpdkc_eal_init(int argc, char **argv);

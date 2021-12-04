@@ -40,14 +40,29 @@ struct port_pair_params *port_pair_params;
 // The number of port pair parameters.
 __u16 nb_port_pair_params;
 
-// The amount of RX queues per l-core.
-unsigned int rx_queue_pl;
+// The port config.
+struct port_conf ports[RTE_MAX_ETHPORTS];
+
+// The amount of RX ports per l-core.
+unsigned int rx_port_pl = 1;
+
+// The amount of TX ports per l-core.
+unsigned int tx_port_pl = 1;
+
+// The amount of RX queues per port.
+unsigned int rx_queue_pp = 1;
+
+// The amount of TX queues per port.
+unsigned int tx_queue_pp = 1;
 
 // The queue's lcore config.
-struct lcore_queue_conf lcore_queue_conf[RTE_MAX_LCORE];
+struct lcore_port_conf lcore_port_conf[RTE_MAX_LCORE];
 
 // The tx buffer.
 struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS];
+
+// The buffer packet burst.
+unsigned int packet_burst_size = MAX_PCKT_BURST;
 
 // The ethernet port's config to set.
 struct rte_eth_conf port_conf =
@@ -270,10 +285,11 @@ struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg)
  * Parses the queue number argument.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
+ * @param tx Whether this is a TX queue count.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret). The amount of queues is stored in ret->data.
 **/
-struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg)
+struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg, int tx)
 {
     // Create DPDK Common's return structure.
     struct dpdkc_ret ret = dpdkc_ret_init();
@@ -286,10 +302,19 @@ struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg)
     n = strtol(arg, &end, 10);
 
     // Check queue count.
-    if (n < 1 || n >= MAX_RX_QUEUE_PER_LCORE)
+    if (n < 1)
     {
         ret.err_num = -1;
         ret.gen_msg = "Amount of queues is below 0.";
+
+        return ret;
+    }
+
+    // Make sure we're not above max queue per port.
+    if ((!tx && n > MAX_RX_QUEUES_PER_PORT) || !(tx && n > MAX_TX_QUEUES_PER_PORT))
+    {
+        ret.err_num = -1;
+        ret.gen_msg = "Too many queues specified.";
 
         return ret;
     }
@@ -620,6 +645,10 @@ void dpdkc_populate_dst_ports()
             p = index & 1;
             port_id = port_pair_params[index >> 1].port[p];
             dst_ports[port_id] = port_pair_params[index >> 1].port[p ^ 1];
+
+            // Set port config.
+            ports[port_id].rx = 1;
+            ports[dst_ports[port_id]].tx = 1;
         }
     }
     else
@@ -638,6 +667,10 @@ void dpdkc_populate_dst_ports()
             {
                 dst_ports[port_id] = last_port;
                 dst_ports[last_port] = port_id;
+
+                // Make sure we set their port configs for TX.
+                ports[last_port].tx = 1;
+                ports[port_id].tx = 1;
             }
             else
             {
@@ -653,6 +686,9 @@ void dpdkc_populate_dst_ports()
         {
             fprintf(stdout, "WARNING - Odd number of ports in port mask.\n");
             dst_ports[last_port] = last_port;
+
+            // Set port config (TX).
+            ports[last_port].tx = 1;
         }
     }
 }
@@ -668,11 +704,13 @@ struct dpdkc_ret dpdkc_ports_queues_mapping()
     struct dpdkc_ret ret = dpdkc_ret_init();
 
     // Pointer we'll be storing individual l-core configs in.
-    struct lcore_queue_conf *qconf = NULL;
+    struct lcore_port_conf *qconf = NULL;
 
-    // RX l-core ID.
+    // L-core IDs.
     unsigned int rx_lcore_id = 0;
+    unsigned int tx_lcore_id = 0;
 
+    // Map ports to l-core.
     RTE_ETH_FOREACH_DEV(port_id)
     {
         // Skip any ports not available.
@@ -681,13 +719,17 @@ struct dpdkc_ret dpdkc_ports_queues_mapping()
             continue;
         }
 
-        // Retrieve the l-core ID.
-        while (rte_lcore_is_enabled(rx_lcore_id) == 0 || lcore_queue_conf[rx_lcore_id].num_rx_ports == rx_queue_pl)
+        // Handle RX ports.
+        if (ports[port_id].rx)
         {
-            // Increment the lcore ID.
-            rx_lcore_id++;
+            // If we've met the number of ports per l-core or the l-core is disabled, increase the ID.
+            if (lcore_port_conf[rx_lcore_id].num_rx_ports == rx_port_pl || rte_lcore_is_enabled(rx_lcore_id) == 0)
+            {
+                // Increment the lcore ID.
+                rx_lcore_id++;
+            }
 
-            // If the new ID is higher or equal to the maximum lcore count, we need to exit with an error.
+            // If the ID is higher or equal to the maximum lcore count, we need to exit with an error.
             if (rx_lcore_id >= RTE_MAX_LCORE)
             {
                 ret.err_num = -1;
@@ -695,23 +737,43 @@ struct dpdkc_ret dpdkc_ports_queues_mapping()
 
                 return ret;
             }
+
+            // Assign pointer to make things easier.
+            qconf = &lcore_port_conf[rx_lcore_id];
+
+            // Assign port_id and increment count.
+            qconf->rx_port_list[qconf->num_rx_ports] = port_id;
+            qconf->num_rx_ports++;
+
         }
 
-        // Assign qconf to current lcore queue config's memory location.
-        if (qconf != &lcore_queue_conf[rx_lcore_id])
+        // Handle TX ports.
+        if (ports[port_id].tx)
         {
-            qconf = &lcore_queue_conf[rx_lcore_id];
+            // If we've met the number of ports per l-core or the l-core is disabled, increase the ID.
+            if (lcore_port_conf[tx_lcore_id].num_tx_ports == tx_port_pl || rte_lcore_is_enabled(rx_lcore_id) == 0)
+            {
+                // Increment the lcore ID.
+                tx_lcore_id++;
+            }
 
-            // Increase l-cores count.
-            nb_lcores++;
+            // If the ID is higher or equal to the maximum lcore count, we need to exit with an error.
+            if (tx_lcore_id >= RTE_MAX_LCORE)
+            {
+                ret.err_num = -1;
+                ret.gen_msg = "Failed due to l-core ID exceeding the maximum amount of l-cores.";
+
+                return ret;
+            }
+
+            // Assign pointer to make things easier.
+            qconf = &lcore_port_conf[tx_lcore_id];
+
+            // Assign port_id and increment count.
+            qconf->tx_port_list[qconf->num_tx_ports] = port_id;
+            qconf->num_tx_ports++;
+
         }
-
-        // Assign port_id to port list at qconf->num_rx_ports index and increase RX port count.
-        qconf->rx_port_list[qconf->num_rx_ports] = port_id;
-        qconf->num_rx_ports++;
-
-        // Print verbose message.
-        fprintf(stdout, "Setting up l-core #%u with RX port %u and TX port %u.\n", rx_lcore_id, port_id, dst_ports[port_id]);
     }
 
     return ret;
@@ -752,7 +814,7 @@ struct dpdkc_ret dpdkc_create_mbuf()
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue)
+struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queues, int tx_queues)
 {
     // Initialize return variable (custom error).
     struct dpdkc_ret ret = dpdkc_ret_init();
@@ -796,7 +858,7 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue
         }
 
         // Configure the queues for this port.
-        if ((ret.err_num = rte_eth_dev_configure(port_id, rx_queue, tx_queue, &local_port_conf)) < 0)
+        if ((ret.err_num = rte_eth_dev_configure(port_id, rx_queues, tx_queues, &local_port_conf)) < 0)
         {
             ret.port_id = port_id;
             ret.gen_msg = "Failed to configure ethernet device with RX and TX queues.";
@@ -816,7 +878,7 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue
         // Initialize the RX queues.
         fflush(stdout);
 
-        for (i = 0; i < rx_queue; i++)
+        for (i = 0; i < rx_queues; i++)
         {
             // Initialize RX config and set values from port configuration.
             struct rte_eth_rxconf rxq_conf;
@@ -835,10 +897,16 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue
             }
         }
 
+        // If we have more than one RX queue, set the port config (RX).
+        if (rx_queues > 0)
+        {
+            ports[port_id].rx = 1;
+        }
+
         // Initialize the TX queues.
         fflush(stdout);
 
-        for (i = 0; i < tx_queue; i++)
+        for (i = 0; i < tx_queues; i++)
         {
             // Initialize TX config and sset values from port configuration.
             struct rte_eth_txconf txq_conf;
@@ -857,21 +925,26 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue
             }
         }
 
-        // Initialize TX buffers.
-        tx_buffer[port_id] = rte_zmalloc_socket("tx_buffer", RTE_ETH_TX_BUFFER_SIZE(MAX_PCKT_BURST), 0, rte_eth_dev_socket_id(port_id));
-
-        // Check if the TX buffer allocation was successful.
-        if (tx_buffer[port_id] == NULL)
+        // If we have more than one TX queue, set the port config TX.
+        if (tx_queues > 0)
         {
-            ret.err_num = -1;
-            ret.port_id = port_id;
-            ret.gen_msg = "Failed to allocate TX buffer.";
+            ports[port_id].tx = 1;
 
-            return ret;
+            tx_buffer[port_id] = rte_zmalloc_socket("tx_buffer", RTE_ETH_TX_BUFFER_SIZE(packet_burst_size), 0, rte_eth_dev_socket_id(port_id));
+
+            // Check if the TX buffer allocation was successful.
+            if (tx_buffer[port_id] == NULL)
+            {
+                ret.err_num = -1;
+                ret.port_id = port_id;
+                ret.gen_msg = "Failed to allocate TX buffer.";
+
+                return ret;
+            }
+
+            // Initialize the buffer itself within TX and check its result.
+            rte_eth_tx_buffer_init(tx_buffer[port_id], packet_burst_size);
         }
-
-        // Initialize the buffer itself within TX and check its result.
-        rte_eth_tx_buffer_init(tx_buffer[port_id], MAX_PCKT_BURST);
 
         // We'll want to disable PType parsing.
         if ((ret.err_num = rte_eth_dev_set_ptypes(port_id, RTE_PTYPE_UNKNOWN, NULL, 0)) < 0)
@@ -905,7 +978,7 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue
         }
 
         // Set verbose message.
-        fprintf(stdout, "Port #%u setup successfully. MAC Address => " RTE_ETHER_ADDR_PRT_FMT ".\n", port_id, RTE_ETHER_ADDR_BYTES(&ports_eth[port_id]));
+        fprintf(stdout, "Port #%d setup successfully with %d RX queues and %d TX queues. MAC Address => " RTE_ETHER_ADDR_PRT_FMT ".\n", port_id, rx_queues, tx_queues, RTE_ETHER_ADDR_BYTES(&ports_eth[port_id]));
     }
 
     // We're done!
