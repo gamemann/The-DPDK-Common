@@ -552,8 +552,14 @@ struct dpdkc_ret dpdkc_get_nb_ports()
     if (ret.err_num != 0)
     {
         ret.gen_msg = "No available ports.";
+
+        return ret;
     }
 
+    // Store value in global variable.
+    nb_ports = num;
+
+    // Also store value in data.
     ret.data = num;
 
     return ret;
