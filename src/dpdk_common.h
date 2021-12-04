@@ -119,6 +119,7 @@ void dpdkc_populate_dst_ports();
 struct dpdkc_ret dpdkc_ports_queues_mapping();
 struct dpdkc_ret dpdkc_create_mbuf();
 struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
+struct dpdkc_ret dpdkc_get_available_lcore_count();
 struct dpdkc_ret dpdkc_ports_available();
 void dpdkc_launch_and_run(void *f);
 struct dpdkc_ret dpdkc_port_stop_and_remove();

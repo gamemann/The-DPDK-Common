@@ -995,15 +995,51 @@ struct dpdkc_ret dpdkc_ports_available()
     // Create DPDK Common's return structure.
     struct dpdkc_ret ret = dpdkc_ret_init();
 
+    // Check for error.
     ret.err_num = !(nb_ports_available > 0);
 
-    // Check.
     if (ret.err_num != 0)
     {
         ret.gen_msg = "Number of available ports is 0. Make sure port mask is set correctly.";
     }
 
     ret.data = nb_ports_available;
+
+    return ret;
+}
+
+/**
+ * Retrieves the amount of l-cores that are enabled and stores it in nb_lcores variable.
+ * 
+ * @return The DPDK Common return structure (struct dpdkc_ret). The amount of available ports is returned in ret->data.
+**/
+struct dpdkc_ret dpdkc_get_available_lcore_count()
+{
+    // Create DPDK Common's return structure.
+    struct dpdkc_ret ret = dpdkc_ret_init();
+
+    // Loop through each l-core.
+    RTE_LCORE_FOREACH(lcore_id)
+    {
+        // Check if it is enabled.
+        if (rte_lcore_is_enabled(lcore_id) == 0)
+        {
+            continue;
+        }
+
+        nb_lcores++;
+    }
+
+    // Check for none available l-cores.
+    ret.err_num = !(nb_lcores > 0);
+
+    if (ret.err_num != 0)
+    {
+        ret.gen_msg = "Number of enabled l-cores is 0.";
+    }
+
+    // Return number of l-cores in ret.data, but nb_lcores is also global.
+    ret.data = nb_lcores;
 
     return ret;
 }
