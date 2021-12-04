@@ -30,7 +30,7 @@
 #include <linux/types.h>
 
 /* Common defines */
-#define MAX_PCKT_BURST 32
+#define MAX_PCKT_BURST_DEFAULT 32
 #define BURST_TX_DRAIN_US 100
 #define MEMPOOL_CACHE_SIZE 256
 #define RTE_RX_DESC_DEFAULT 1024

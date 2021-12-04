@@ -53,7 +53,7 @@ unsigned int tx_queue_pp = 1;
 struct lcore_port_conf lcore_port_conf[RTE_MAX_LCORE];
 
 // The buffer packet burst.
-unsigned int packet_burst_size = MAX_PCKT_BURST;
+unsigned int packet_burst_size = MAX_PCKT_BURST_DEFAULT;
 
 // The ethernet port's config to set.
 struct rte_eth_conf port_conf =
