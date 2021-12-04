@@ -63,6 +63,7 @@ struct port_conf
     unsigned int rx : 1;
     unsigned int tx : 1;
     struct rte_ether_addr mac;
+    struct rte_eth_dev_tx_buffer *tx_buffer;
 };
 
 struct dpdkc_ret
@@ -92,7 +93,6 @@ extern unsigned int tx_port_pl;
 extern unsigned int rx_queue_pp;
 extern unsigned int tx_queue_pp;
 extern struct lcore_port_conf lcore_port_conf[RTE_MAX_LCORE];
-extern struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS];
 extern struct rte_eth_conf port_conf;
 extern struct rte_mempool *pcktmbuf_pool;
 extern __u16 port_id;

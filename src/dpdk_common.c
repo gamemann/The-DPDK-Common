@@ -55,9 +55,6 @@ unsigned int tx_queue_pp = 1;
 // The queue's lcore config.
 struct lcore_port_conf lcore_port_conf[RTE_MAX_LCORE];
 
-// The tx buffer.
-struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS];
-
 // The buffer packet burst.
 unsigned int packet_burst_size = MAX_PCKT_BURST;
 
@@ -927,10 +924,10 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queues, int tx_queu
         {
             ports[port_id].tx = 1;
 
-            tx_buffer[port_id] = rte_zmalloc_socket("tx_buffer", RTE_ETH_TX_BUFFER_SIZE(packet_burst_size), 0, rte_eth_dev_socket_id(port_id));
+            ports[port_id].tx_buffer = rte_zmalloc_socket("tx_buffer", RTE_ETH_TX_BUFFER_SIZE(packet_burst_size), 0, rte_eth_dev_socket_id(port_id));
 
             // Check if the TX buffer allocation was successful.
-            if (tx_buffer[port_id] == NULL)
+            if (ports[port_id].tx_buffer  == NULL)
             {
                 ret.err_num = -1;
                 ret.port_id = port_id;
@@ -940,7 +937,7 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queues, int tx_queu
             }
 
             // Initialize the buffer itself within TX and check its result.
-            rte_eth_tx_buffer_init(tx_buffer[port_id], packet_burst_size);
+            rte_eth_tx_buffer_init(ports[port_id].tx_buffer , packet_burst_size);
         }
 
         // We'll want to disable PType parsing.
