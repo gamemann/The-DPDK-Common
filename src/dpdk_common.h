@@ -93,6 +93,7 @@ extern unsigned int tx_port_pl;
 extern unsigned int rx_queue_pp;
 extern unsigned int tx_queue_pp;
 extern struct lcore_port_conf lcore_port_conf[RTE_MAX_LCORE];
+extern unsigned int packet_burst_size;
 extern struct rte_eth_conf port_conf;
 extern struct rte_mempool *pcktmbuf_pool;
 extern __u16 port_id;
