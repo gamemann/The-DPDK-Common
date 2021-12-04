@@ -273,14 +273,15 @@ struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg)
 }
 
 /**
- * Parses the queue number argument.
+ * Parses the queue number argument and stores it in the global variable(s).
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
+ * @param rx Whether this is a RX queue count.
  * @param tx Whether this is a TX queue count.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret). The amount of queues is stored in ret->data.
 **/
-struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg, int tx)
+struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg, int rx, int tx)
 {
     // Create DPDK Common's return structure.
     struct dpdkc_ret ret = dpdkc_ret_init();
@@ -302,12 +303,22 @@ struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg, int tx)
     }
 
     // Make sure we're not above max queue per port.
-    if ((!tx && n > MAX_RX_QUEUES_PER_PORT) || !(tx && n > MAX_TX_QUEUES_PER_PORT))
+    if ((rx && n > MAX_RX_QUEUES_PER_PORT) || (tx && n > MAX_TX_QUEUES_PER_PORT))
     {
         ret.err_num = -1;
         ret.gen_msg = "Too many queues specified.";
 
         return ret;
+    }
+
+    // Store in global variable.
+    if (rx)
+    {
+        rx_queue_pp = n;
+    }
+    else if (tx)
+    {
+        tx_queue_pp = n;
     }
 
     ret.data = n;

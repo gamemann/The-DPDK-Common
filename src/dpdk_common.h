@@ -106,7 +106,7 @@ extern unsigned int nb_lcores;
 struct dpdkc_ret dpdkc_ret_init();
 struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg);
 struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg);
-struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg, int tx);
+struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg, int rx, int tx);
 struct dpdkc_ret dpdkc_check_port_pair_config(void);
 void dpdkc_check_link_status();
 struct dpdkc_ret dpdkc_eal_init(int argc, char **argv);
