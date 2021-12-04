@@ -25,9 +25,6 @@ __u16 nb_txd = RTE_TX_DESC_DEFAULT;
 // The enabled port mask.
 __u32 enabled_port_mask = 0;
 
-// Destination ports array.
-__u32 dst_ports[RTE_MAX_ETHPORTS];
-
 // Port pair params array.
 struct port_pair_params port_pair_params_array[RTE_MAX_ETHPORTS / 2];
 
@@ -608,7 +605,7 @@ void dpdkc_reset_dst_ports()
     // Loop through all ports and set them to 0.
     for (port_id = 0; port_id < RTE_MAX_ETHPORTS; port_id++)
     {
-        dst_ports[port_id] = 0;
+        ports[port_id].tx_port = 0;
     }
 }
 
@@ -638,11 +635,11 @@ void dpdkc_populate_dst_ports()
             // Set port ID and dst port.
             p = index & 1;
             port_id = port_pair_params[index >> 1].port[p];
-            dst_ports[port_id] = port_pair_params[index >> 1].port[p ^ 1];
+            ports[port_id].tx_port = port_pair_params[index >> 1].port[p ^ 1];
 
             // Set port config.
             ports[port_id].rx = 1;
-            ports[dst_ports[port_id]].tx = 1;
+            ports[ports[port_id].tx_port].tx = 1;
         }
     }
     else
@@ -659,8 +656,8 @@ void dpdkc_populate_dst_ports()
             // Get remainder and assign dst ports.
             if (nb_ports_in_mask % 2)
             {
-                dst_ports[port_id] = last_port;
-                dst_ports[last_port] = port_id;
+                ports[port_id].tx_port = last_port;
+                ports[last_port].tx_port = port_id;
 
                 // Make sure we set their port configs for TX.
                 ports[last_port].tx = 1;
@@ -679,7 +676,7 @@ void dpdkc_populate_dst_ports()
         if (nb_ports_in_mask % 2)
         {
             fprintf(stdout, "WARNING - Odd number of ports in port mask.\n");
-            dst_ports[last_port] = last_port;
+            ports[last_port].tx_port = last_port;
 
             // Set port config (TX).
             ports[last_port].tx = 1;

@@ -64,6 +64,7 @@ struct port_conf
     unsigned int tx : 1;
     struct rte_ether_addr mac;
     struct rte_eth_dev_tx_buffer *tx_buffer;
+    unsigned int tx_port;
 };
 
 struct dpdkc_ret
@@ -83,7 +84,6 @@ extern volatile __u8 quit;
 extern __u16 nb_rxd;
 extern __u16 nb_txd;
 extern __u32 enabled_port_mask;
-extern __u32 dst_ports[RTE_MAX_ETHPORTS];
 extern struct port_pair_params port_pair_params_array[RTE_MAX_ETHPORTS / 2];
 extern struct port_pair_params *port_pair_params;
 extern __u16 nb_port_pair_params;
