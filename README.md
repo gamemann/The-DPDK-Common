@@ -45,7 +45,7 @@ Including the `src/dpdk_common.h` header in a source or another header file will
 struct dpdkc_ret dpdkc_ret_init();
 
 /**
- * Parses the port mask argument.
+ * Parses the port mask argument and stores it in the enabled_port_mask global variable.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
@@ -63,13 +63,15 @@ struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg);
 struct dpdkc_ret dpdkc_parse_arg_port_pair_config(const char *arg);
 
 /**
- * Parses the queue number argument.
+ * Parses the queue number argument and stores it in the global variable(s).
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
+ * @param rx Whether this is a RX queue count.
+ * @param tx Whether this is a TX queue count.
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret). The amount of queues is stored in ret->data.
 **/
-struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg);
+struct dpdkc_ret dpdkc_parse_arg_queues(const char *arg, int rx, int tx)
 
 /**
  * Checks the port pair config after initialization.
@@ -148,12 +150,12 @@ struct dpdkc_ret dpdkc_create_mbuf();
  * Initializes all ports and RX/TX queues.
  * 
  * @param promisc If 1, promisc mode is turned on for all ports/devices.
- * @param rx_queue The amount of RX queues per port (recommend setting to 1).
- * @param tx_queue The amount of TX queues per port (recommend setting to 1).
+ * @param rx_queues The amount of RX queues per port (recommend setting to 1).
+ * @param tx_queues The amount of TX queues per port (recommend setting to 1).
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
-struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue);
+struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queues, int tx_queues);
 
 /**
  * Check if the number of available ports is above one.
@@ -161,6 +163,13 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queue, int tx_queue
  * @return The DPDK Common return structure (struct dpdkc_ret). The amount of available ports is returned in ret->data.
 **/
 struct dpdkc_ret dpdkc_ports_available();
+
+/**
+ * Retrieves the amount of l-cores that are enabled and stores it in nb_lcores variable.
+ * 
+ * @return The DPDK Common return structure (struct dpdkc_ret). The amount of available ports is returned in ret->data.
+**/
+struct dpdkc_ret dpdkc_get_available_lcore_count()
 
 /**
  * Launches the DPDK application and waits for all l-cores to exit.
@@ -211,21 +220,15 @@ int check_and_del_lru_from_hash_table(void *tbl, __u64 max_entries);
 Additionally, there are useful global variables directed towards aspects of the program for the DPDK. However, these are prefixed with the `extern` tag within the `src/dpdk_common.h` header file allowing you to use them anywhere else assuming the file is included and the object file built from `make` is linked.
 
 ```C
-// Variable to use for signals (set to 1 to force application to exit).
+// Variable to use for signals.
 volatile __u8 quit;
 
-// The RX and TX descriptor count (using defaults).
+// The RX and TX descriptor sizes (using defaults).
 __u16 nb_rxd = RTE_RX_DESC_DEFAULT;
 __u16 nb_txd = RTE_TX_DESC_DEFAULT;
 
-// Array to store the MAC addresses of all ports.
-struct rte_ether_addr ports_eth[RTE_MAX_ETHPORTS];
-
 // The enabled port mask.
 __u32 enabled_port_mask = 0;
-
-// Destination ports array.
-__u32 dst_ports[RTE_MAX_ETHPORTS];
 
 // Port pair params array.
 struct port_pair_params port_pair_params_array[RTE_MAX_ETHPORTS / 2];
@@ -236,14 +239,26 @@ struct port_pair_params *port_pair_params;
 // The number of port pair parameters.
 __u16 nb_port_pair_params;
 
-// The amount of RX queues per l-core.
-unsigned int rx_queue_pl;
+// The port config.
+struct port_conf ports[RTE_MAX_ETHPORTS];
+
+// The amount of RX ports per l-core.
+unsigned int rx_port_pl = 1;
+
+// The amount of TX ports per l-core.
+unsigned int tx_port_pl = 1;
+
+// The amount of RX queues per port.
+unsigned int rx_queue_pp = 1;
+
+// The amount of TX queues per port.
+unsigned int tx_queue_pp = 1;
 
 // The queue's lcore config.
-struct lcore_queue_conf lcore_queue_conf[RTE_MAX_LCORE];
+struct lcore_port_conf lcore_port_conf[RTE_MAX_LCORE];
 
-// The tx buffer.
-struct rte_eth_dev_tx_buffer *tx_buffer[RTE_MAX_ETHPORTS];
+// The buffer packet burst.
+unsigned int packet_burst_size = MAX_PCKT_BURST_DEFAULT;
 
 // The ethernet port's config to set.
 struct rte_eth_conf port_conf =
