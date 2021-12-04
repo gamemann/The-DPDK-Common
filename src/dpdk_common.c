@@ -60,12 +60,12 @@ struct rte_eth_conf port_conf =
 {
     .rxmode =
     {
-        .split_hdr_size = 1,
+        .split_hdr_size = 1
     },
     .rxmode =
     {
-        .mq_mode = RTE_ETH_MQ_TX_NONE,
-    },
+        .mq_mode = RTE_ETH_MQ_TX_NONE
+    }
 };
 
 // A pointer to the mbuf_pool for packets.
@@ -117,7 +117,7 @@ struct dpdkc_ret dpdkc_ret_init()
 }
 
 /**
- * Parses the port mask argument.
+ * Parses the port mask argument and stores it in the enabled_port_mask global variable.
  * 
  * @param arg A (const) pointer to the optarg variable from getopt.h.
  * 
@@ -821,8 +821,8 @@ struct dpdkc_ret dpdkc_create_mbuf()
  * Initializes all ports and RX/TX queues.
  * 
  * @param promisc If 1, promisc mode is turned on for all ports/devices.
- * @param rx_queue The amount of RX queues per port (recommend setting to 1).
- * @param tx_queue The amount of TX queues per port (recommend setting to 1).
+ * @param rx_queues The amount of RX queues per port (recommend setting to 1).
+ * @param tx_queues The amount of TX queues per port (recommend setting to 1).
  * 
  * @return The DPDK Common return structure (struct dpdkc_ret).
 **/
