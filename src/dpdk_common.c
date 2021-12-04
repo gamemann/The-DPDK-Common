@@ -22,9 +22,6 @@ volatile __u8 quit;
 __u16 nb_rxd = RTE_RX_DESC_DEFAULT;
 __u16 nb_txd = RTE_TX_DESC_DEFAULT;
 
-// Array to store the MAC addresses of all ports.
-struct rte_ether_addr ports_eth[RTE_MAX_ETHPORTS];
-
 // The enabled port mask.
 __u32 enabled_port_mask = 0;
 
@@ -867,7 +864,7 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queues, int tx_queu
         }
 
         // Retrieve MAC address of device and store in array.
-        if ((ret.err_num = rte_eth_macaddr_get(port_id, &ports_eth[port_id])) < 0)
+        if ((ret.err_num = rte_eth_macaddr_get(port_id, &ports[port_id].mac)) < 0)
         {
             ret.port_id = port_id;
             ret.gen_msg = "Failed to retrieve MAC address on port.";
@@ -978,7 +975,7 @@ struct dpdkc_ret dpdkc_ports_queues_init(int promisc, int rx_queues, int tx_queu
         }
 
         // Set verbose message.
-        fprintf(stdout, "Port #%d setup successfully with %d RX queues and %d TX queues. MAC Address => " RTE_ETHER_ADDR_PRT_FMT ".\n", port_id, rx_queues, tx_queues, RTE_ETHER_ADDR_BYTES(&ports_eth[port_id]));
+        fprintf(stdout, "Port #%d setup successfully with %d RX queues and %d TX queues. MAC Address => " RTE_ETHER_ADDR_PRT_FMT ".\n", port_id, rx_queues, tx_queues, RTE_ETHER_ADDR_BYTES(&ports[port_id].mac));
     }
 
     // We're done!

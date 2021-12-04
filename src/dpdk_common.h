@@ -56,13 +56,13 @@ struct lcore_port_conf
     unsigned rx_port_list[MAX_RX_PORTS_PER_LCORE];
     unsigned num_tx_ports;
     unsigned tx_port_list[MAX_TX_PORTS_PER_LCORE];
-    struct rte_ether_addr mac;
 } __rte_cache_aligned;
 
 struct port_conf
 {
     unsigned int rx : 1;
     unsigned int tx : 1;
+    struct rte_ether_addr mac;
 };
 
 struct dpdkc_ret
@@ -81,7 +81,6 @@ struct dpdkc_ret
 extern volatile __u8 quit;
 extern __u16 nb_rxd;
 extern __u16 nb_txd;
-extern struct rte_ether_addr ports_eth[RTE_MAX_ETHPORTS];
 extern __u32 enabled_port_mask;
 extern __u32 dst_ports[RTE_MAX_ETHPORTS];
 extern struct port_pair_params port_pair_params_array[RTE_MAX_ETHPORTS / 2];
