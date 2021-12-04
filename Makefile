@@ -26,15 +26,20 @@ $(error "Cannot generate statically-linked binaries with this version of pkg-con
 endif
 endif
 
-all: $(BUILDDIR)/$(DPDKCOMMONOBJ)-build
+all: static shared
 .PHONY: all
 
 makebuilddir:
-	mkdir -p $(BUILDDIR)
+	mkdir -p $(BUILDDIR)/static
+	mkdir -p $(BUILDDIR)/shared
 
-$(BUILDDIR)/$(DPDKCOMMONOBJ)-build: $(SRCDIR)/$(DPDKCOMMONSRC) Makefile $(PC_FILE) | makebuilddir
-	$(CC) -c $(CFLAGS) $(SRCDIR)/$(DPDKCOMMONSRC) -o $(BUILDDIR)/$(DPDKCOMMONOBJ) $(LDFLAGS) $(LDFLAGS_SHARED)
+static: $(SRCDIR)/$(DPDKCOMMONSRC) Makefile $(PC_FILE) | makebuilddir
+	$(CC) -c $(CFLAGS) $(SRCDIR)/$(DPDKCOMMONSRC) -o $(BUILDDIR)/static/$(DPDKCOMMONOBJ) $(LDFLAGS) $(LDFLAGS_STATIC)
+
+shared: $(SRCDIR)/$(DPDKCOMMONSRC) Makefile $(PC_FILE) | makebuilddir
+	$(CC) -c $(CFLAGS) $(SRCDIR)/$(DPDKCOMMONSRC) -o $(BUILDDIR)/shared/$(DPDKCOMMONOBJ) $(LDFLAGS) $(LDFLAGS_SHARED)
 
 .PHONY: clean
 clean:
-	rm -f $(BUILDDIR)/$(DPDKCOMMONOBJ)
+	rm -f $(BUILDDIR)/static/$(DPDKCOMMONOBJ)
+	rm -f $(BUILDDIR)/shared/$(DPDKCOMMONOBJ)
