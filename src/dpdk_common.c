@@ -134,6 +134,10 @@ struct dpdkc_ret dpdkc_parse_arg_port_mask(const char *arg)
     // Parse hexadecimal.
     pm = strtoul(arg, &end, 16);
 
+    // Store port mask in global port mask variable.
+    enabled_port_mask = pm;
+
+    // Also store value in data.
     ret.data = pm;
 
     return ret;
