@@ -526,11 +526,11 @@ struct dpdkc_ret dpdkc_eal_init(int argc, char **argv)
     {
         ret.err_num = -1;
         ret.gen_msg = "Failed to initialize EAL.";
+
+        return ret;
     }
-    else
-    {
-        ret.data = tmp;
-    }
+
+    ret.data = tmp;
 
     return ret;
 }
