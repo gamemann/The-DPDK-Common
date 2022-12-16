@@ -12,6 +12,7 @@ My main goal is to help other developers with the DPDK along with myself. From w
 I have other projects in the pipeline that'll use DPDK Common once I implement a few other things. However, here is the current list.
 
 * [Examples/Tests](https://github.com/gamemann/The-DPDK-Examples) - A repository I'm using to store examples and tests of the DPDK while I learn it.
+* [Packet Batch](https://github.com/Packet-Batch) (the DPDK [version](https://github.com/Packet-Batch/PB-DPDK)).
 
 ## The Custom Return Structure
 This project uses a custom return structure for functions returning values (non-void). The name of the structure is `dpdkc_ret`.
