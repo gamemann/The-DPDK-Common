@@ -60,10 +60,6 @@ struct rte_eth_conf port_conf =
 {
     .rxmode =
     {
-        .split_hdr_size = 1
-    },
-    .rxmode =
-    {
         .mq_mode = RTE_ETH_MQ_TX_NONE
     }
 };
